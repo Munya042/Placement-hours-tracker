@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#166534">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Placement Hours">
+<title>Placement Hours Tracker</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{color-scheme:light dark;--bg:#f3f6f4;--card:#fff;--text:#17201c;--muted:#68736c;--border:#d7dfda;--green:#15803d;--red:#b91c1c;--blue:#2563eb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{width:min(820px,100%);margin:auto;padding:max(16px,env(safe-area-inset-top)) 14px max(30px,env(safe-area-inset-bottom))}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.top h1{font-size:1.4rem;margin:0}.icon-btn,.small-btn{min-height:auto;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:12px;padding:9px 12px;font-weight:650;font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px}.label{font-size:.82rem;color:var(--muted);margin-bottom:4px}.value{font-size:1.18rem;font-weight:750}
+.timer-card{text-align:center;margin-top:10px}.status{color:var(--muted);margin-bottom:8px}.timer{font-size:clamp(2.6rem,12vw,4.6rem);font-weight:850;letter-spacing:.03em}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}button{cursor:pointer;touch-action:manipulation}
+.big{min-height:118px;border:0;border-radius:24px;color:#fff;font-size:1.7rem;font-weight:850}.start{background:var(--green)}.stop{background:var(--red)}button:disabled{opacity:.35;cursor:not-allowed}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.action{min-height:48px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:700}
+.section{margin-top:10px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.section h2{font-size:1.05rem;margin:0}
+.record{display:grid;grid-template-columns:1.3fr .9fr .9fr .9fr auto;gap:7px;align-items:center;padding:11px 0;border-top:1px solid var(--border);font-size:.87rem}.record button{border:0;background:transparent;color:var(--blue);padding:6px}.empty{text-align:center;color:var(--muted);padding:20px 0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;padding:0;z-index:10}.modal.open{display:flex}.sheet{background:var(--card);width:min(680px,100%);border-radius:22px 22px 0 0;padding:18px;max-height:92vh;overflow:auto}.sheet h2{margin:0 0 14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:block}.field span{display:block;font-size:.82rem;color:var(--muted);margin-bottom:5px}.input-wrap{display:flex;width:100%;min-width:0;border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--bg)}input{display:block;width:100%;min-width:0;border:0;background:transparent;color:var(--text);font-size:1rem;padding:0}input:focus{outline:none}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}.primary{background:var(--green);color:white;border:0;border-radius:12px;padding:11px 16px;font-weight:750}.danger{background:var(--red);color:white;border:0;border-radius:12px;padding:11px 16px;font-weight:750}
+.sync-box{margin-top:10px}.sync-status{font-size:.86rem;color:var(--muted);margin-top:7px}.notice{font-size:.78rem;color:var(--muted);text-align:center;margin-top:12px}
+@media(max-width:560px){.buttons{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.record{grid-template-columns:1.2fr .8fr .8fr}.record .hours{grid-column:1/-2}.form-grid{grid-template-columns:1fr}}
+@media(prefers-color-scheme:dark){:root{--bg:#101512;--card:#18201b;--text:#eef4f0;--muted:#a6b2aa;--border:#344139}}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <h1>Placement Hours</h1>
+    <button id="settingsBtn" class="icon-btn" type="button">Settings & Sync</button>
+  </header>
+
+  <section class="grid">
+    <div class="card"><div class="label">Date</div><div id="date" class="value">—</div></div>
+    <div class="card"><div class="label">Current time</div><div id="clock" class="value">—</div></div>
+    <div class="card"><div class="label">Total hours</div><div id="totalHours" class="value">0h 00m</div></div>
+    <div class="card"><div class="label">Total days</div><div id="totalDays" class="value">0</div></div>
+  </section>
+
+  <section class="card timer-card">
+    <div id="status" class="status">Ready to start</div>
+    <div id="timer" class="timer">00:00:00</div>
+    <div class="buttons">
+      <button id="startBtn" class="big start" type="button">START</button>
+      <button id="stopBtn" class="big stop" type="button" disabled>STOP</button>
+    </div>
+  </section>
+
+  <section class="actions">
+    <button id="addBtn" class="action" type="button">＋ Add previous shift</button>
+    <button id="exportBtn" class="action" type="button">Export CSV</button>
+    <button id="backupBtn" class="action" type="button">Backup / Restore</button>
+  </section>
+
+  <section class="card section">
+    <div class="section-head">
+      <h2>History</h2>
+      <button id="clearBtn" class="small-btn" type="button">Clear all</button>
+    </div>
+    <div id="history"></div>
+  </section>
+
+  <p class="notice">Works offline. Local records stay on this device. Cloud sync is optional.</p>
+</main>
+
+<div id="shiftModal" class="modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <h2 id="shiftTitle">Add previous shift</h2>
+    <div class="form-grid">
+      <label class="field"><span>Date</span><div class="input-wrap"><input id="shiftDate" type="date"></div></label>
+      <label class="field"><span>Start time</span><div class="input-wrap"><input id="shiftStart" type="time"></div></label>
+      <label class="field"><span>Finish time</span><div class="input-wrap"><input id="shiftFinish" type="time"></div></label>
+      <label class="field"><span>Break minutes</span><div class="input-wrap"><input id="shiftBreak" type="number" min="0" step="1" value="0"></div></label>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelShift" class="small-btn" type="button">Cancel</button>
+      <button id="deleteShift" class="danger" type="button" hidden>Delete</button>
+      <button id="saveShift" class="primary" type="button">Save shift</button>
+    </div>
+  </div>
+</div>
+
+<div id="backupModal" class="modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <h2>Backup and restore</h2>
+    <p>Download a backup file before changing phones or clearing browser data.</p>
+    <div class="actions">
+      <button id="downloadBackup" class="action" type="button">Download backup</button>
+      <button id="restoreBackup" class="action" type="button">Restore backup</button>
+      <button id="closeBackup" class="action" type="button">Close</button>
+    </div>
+    <input id="restoreFile" type="file" accept="application/json" hidden>
+  </div>
+</div>
+
+<div id="settingsModal" class="modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <h2>Settings and cloud sync</h2>
+    <label class="field"><span>Required placement hours (optional)</span><div class="input-wrap"><input id="goalHours" type="number" min="0" step=".5" placeholder="Example: 400"></div></label>
+    <div id="goalSummary" class="sync-status"></div>
+
+    <div class="card sync-box">
+      <strong>Firebase cloud sync</strong>
+      <p class="sync-status">Paste your Firebase web configuration below once. Then sign in with Google to sync records across devices.</p>
+      <div class="form-grid">
+        <label class="field"><span>API key</span><div class="input-wrap"><input id="fbApiKey"></div></label>
+        <label class="field"><span>Auth domain</span><div class="input-wrap"><input id="fbAuthDomain"></div></label>
+        <label class="field"><span>Project ID</span><div class="input-wrap"><input id="fbProjectId"></div></label>
+        <label class="field"><span>App ID</span><div class="input-wrap"><input id="fbAppId"></div></label>
+      </div>
+      <div class="modal-actions">
+        <button id="disconnectBtn" class="small-btn" type="button">Disconnect</button>
+        <button id="syncBtn" class="primary" type="button">Save & sign in</button>
+      </div>
+      <div id="syncStatus" class="sync-status">Not connected</div>
+    </div>
+
+    <div class="modal-actions"><button id="closeSettings" class="small-btn" type="button">Close</button></div>
+  </div>
+</div>
+
+<script type="module">
+const STORAGE="placementTracker.records.v2", ACTIVE="placementTracker.active.v2", SETTINGS="placementTracker.settings.v2";
+const $=id=>document.getElementById(id);
+let records=read(STORAGE,[]), active=localStorage.getItem(ACTIVE)?new Date(localStorage.getItem(ACTIVE)):null;
+let settings=read(SETTINGS,{goalHours:"",firebase:{}});
+let editingId=null, cloud=null, currentUser=null;
+
+function read(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
+function save(){localStorage.setItem(STORAGE,JSON.stringify(records));render();syncUp().catch(()=>{})}
+function id(){return crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random()}
+function time(d){return d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}
+function dur(ms,seconds=false){const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60;return seconds?[h,m,x].map(v=>String(v).padStart(2,"0")).join(":"):`${h}h ${String(m).padStart(2,"0")}m`}
+function dayKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function netMs(r){return Math.max(0,new Date(r.finish)-new Date(r.start)-(Number(r.breakMinutes)||0)*60000)}
+function totalMs(){return records.reduce((a,r)=>a+netMs(r),0)+(active?Date.now()-active:0)}
+
+function clock(){
+ const n=new Date(); $("date").textContent=n.toLocaleDateString([],{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+ $("clock").textContent=n.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+ if(active){$("timer").textContent=dur(n-active,true);$("status").textContent=`Working — started ${time(active)}`}
+ summary()
+}
+function summary(){
+ const ms=totalMs(); $("totalHours").textContent=dur(ms);
+ const days=new Set(records.map(r=>dayKey(new Date(r.start))));if(active)days.add(dayKey(active));$("totalDays").textContent=days.size;
+ const goal=Number(settings.goalHours)||0;$("goalSummary").textContent=goal?`${(ms/3600000).toFixed(2)} of ${goal} hours completed — ${Math.max(0,goal-ms/3600000).toFixed(2)} remaining`:"No target set.";
+}
+function render(){
+ $("startBtn").disabled=!!active;$("stopBtn").disabled=!active;
+ const h=$("history");h.innerHTML="";
+ if(!records.length){h.innerHTML='<div class="empty">No completed shifts yet.</div>';summary();return}
+ [...records].sort((a,b)=>new Date(b.start)-new Date(a.start)).forEach(r=>{
+   const s=new Date(r.start),f=new Date(r.finish),row=document.createElement("div");row.className="record";
+   row.innerHTML=`<div><strong>${s.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})}</strong></div><div>${time(s)}</div><div>${time(f)}</div><div class="hours"><strong>${dur(netMs(r))}</strong></div><button type="button" aria-label="Edit shift">Edit</button>`;
+   row.querySelector("button").addEventListener("click",()=>openShift(r));h.appendChild(row)
+ });summary()
+}
+$("startBtn").addEventListener("click",()=>{if(active)return;active=new Date();localStorage.setItem(ACTIVE,active.toISOString());render();clock()});
+$("stopBtn").addEventListener("click",()=>{if(!active)return;const f=new Date();records.push({id:id(),start:active.toISOString(),finish:f.toISOString(),breakMinutes:0,updatedAt:Date.now()});active=null;localStorage.removeItem(ACTIVE);$("timer").textContent="00:00:00";$("status").textContent=`Stopped at ${time(f)}`;save()});
+
+function openShift(r=null){
+ editingId=r?.id||null;$("shiftTitle").textContent=r?"Edit shift":"Add previous shift";$("deleteShift").hidden=!r;
+ const d=r?new Date(r.start):new Date();$("shiftDate").value=dayKey(d);$("shiftStart").value=r?new Date(r.start).toTimeString().slice(0,5):"08:00";$("shiftFinish").value=r?new Date(r.finish).toTimeString().slice(0,5):"16:00";$("shiftBreak").value=r?.breakMinutes||0;$("shiftModal").classList.add("open")
+}
+$("addBtn").addEventListener("click",()=>openShift());
+$("cancelShift").addEventListener("click",()=>$("shiftModal").classList.remove("open"));
+$("saveShift").addEventListener("click",()=>{
+ const d=$("shiftDate").value,s=$("shiftStart").value,f=$("shiftFinish").value,b=Number($("shiftBreak").value)||0;if(!d||!s||!f)return alert("Enter the date, start time, and finish time.");
+ const start=new Date(`${d}T${s}`),finish=new Date(`${d}T${f}`);if(finish<=start)finish.setDate(finish.getDate()+1);
+ const rec={id:editingId||id(),start:start.toISOString(),finish:finish.toISOString(),breakMinutes:b,updatedAt:Date.now()};
+ records=editingId?records.map(x=>x.id===editingId?rec:x):[...records,rec];$("shiftModal").classList.remove("open");save()
+});
+$("deleteShift").addEventListener("click",()=>{if(editingId&&confirm("Delete this shift?")){records=records.filter(r=>r.id!==editingId);$("shiftModal").classList.remove("open");save()}});
+$("clearBtn").addEventListener("click",()=>{if(active)return alert("Stop the current timer first.");if(confirm("Delete every shift?")){records=[];save()}});
+$("exportBtn").addEventListener("click",()=>{
+ const rows=[["Date","Start","Finish","Break minutes","Hours"],...records.map(r=>{const s=new Date(r.start),f=new Date(r.finish);return [dayKey(s),time(s),time(f),r.breakMinutes||0,(netMs(r)/3600000).toFixed(2)]})];
+ download("placement-hours.csv",rows.map(row=>row.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n"),"text/csv")
+});
+function download(name,data,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$("backupBtn").addEventListener("click",()=>$("backupModal").classList.add("open"));$("closeBackup").addEventListener("click",()=>$("backupModal").classList.remove("open"));
+$("downloadBackup").addEventListener("click",()=>download("placement-hours-backup.json",JSON.stringify({version:2,records,settings},null,2),"application/json"));
+$("restoreBackup").addEventListener("click",()=>$("restoreFile").click());
+$("restoreFile").addEventListener("change",async e=>{try{const x=JSON.parse(await e.target.files[0].text());if(!Array.isArray(x.records))throw 0;records=x.records;settings=x.settings||settings;localStorage.setItem(SETTINGS,JSON.stringify(settings));save();alert("Backup restored.")}catch{alert("That backup file could not be read.")}});
+
+$("settingsBtn").addEventListener("click",()=>{loadSettingsForm();$("settingsModal").classList.add("open")});$("closeSettings").addEventListener("click",()=>{$("settingsModal").classList.remove("open")});
+function loadSettingsForm(){ $("goalHours").value=settings.goalHours||"";const f=settings.firebase||{};$("fbApiKey").value=f.apiKey||"";$("fbAuthDomain").value=f.authDomain||"";$("fbProjectId").value=f.projectId||"";$("fbAppId").value=f.appId||"";summary()}
+$("goalHours").addEventListener("change",()=>{settings.goalHours=$("goalHours").value;localStorage.setItem(SETTINGS,JSON.stringify(settings));summary()});
+
+$("syncBtn").addEventListener("click",async()=>{
+ settings.firebase={apiKey:$("fbApiKey").value.trim(),authDomain:$("fbAuthDomain").value.trim(),projectId:$("fbProjectId").value.trim(),appId:$("fbAppId").value.trim()};
+ localStorage.setItem(SETTINGS,JSON.stringify(settings));
+ if(Object.values(settings.firebase).some(v=>!v))return alert("Fill in all four Firebase fields.");
+ await connectCloud(true)
+});
+$("disconnectBtn").addEventListener("click",async()=>{try{if(cloud)await cloud.signOut(cloud.auth)}catch{}currentUser=null;$("syncStatus").textContent="Disconnected";cloud=null});
+
+async function connectCloud(interactive=false){
+ const c=settings.firebase||{};if(!c.apiKey||!c.authDomain||!c.projectId||!c.appId)return;
+ $("syncStatus").textContent="Connecting…";
+ try{
+  const appMod=await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js");
+  const authMod=await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js");
+  const fsMod=await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js");
+  const app=appMod.initializeApp(c),auth=authMod.getAuth(app),db=fsMod.getFirestore(app);
+  cloud={auth,db,...authMod,...fsMod};
+  currentUser=auth.currentUser;
+  if(!currentUser&&interactive){const provider=new authMod.GoogleAuthProvider();const result=await authMod.signInWithPopup(auth,provider);currentUser=result.user}
+  if(!currentUser){$("syncStatus").textContent="Configuration saved. Tap Save & sign in.";return}
+  $("syncStatus").textContent=`Signed in as ${currentUser.email||"user"} — syncing`;
+  await syncDown();await syncUp();$("syncStatus").textContent=`Synced as ${currentUser.email||"user"}`;
+ }catch(e){console.error(e);$("syncStatus").textContent="Sync failed. Check Firebase setup and authorised domains."}
+}
+async function syncUp(){
+ if(!cloud||!currentUser)return;
+ const ref=cloud.doc(cloud.db,"users",currentUser.uid);
+ await cloud.setDoc(ref,{records,updatedAt:Date.now()},{merge:true})
+}
+async function syncDown(){
+ if(!cloud||!currentUser)return;
+ const snap=await cloud.getDoc(cloud.doc(cloud.db,"users",currentUser.uid));
+ if(!snap.exists())return;
+ const remote=snap.data().records||[];const map=new Map([...records,...remote].sort((a,b)=>(a.updatedAt||0)-(b.updatedAt||0)).map(r=>[r.id,r]));records=[...map.values()];localStorage.setItem(STORAGE,JSON.stringify(records));render()
+}
+
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+render();clock();setInterval(clock,1000);connectCloud(false);
+</script>
+</body>
+</html>
