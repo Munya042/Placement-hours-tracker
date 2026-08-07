@@ -27,3 +27,4 @@ FIREBASE SYNC SETUP
 8. Open Settings & Sync in the tracker and select Save & sign in.
 
 Keep regular JSON backups even when cloud sync is enabled.
+Last deployment refresh
