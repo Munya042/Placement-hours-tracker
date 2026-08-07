@@ -1,7 +1,8 @@
 {
-  "name": "Placement Hours Tracker Pro",
+  "name": "Placement Hours Tracker",
   "short_name": "Placement Hours",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f3f6f4",
   "theme_color": "#166534",
