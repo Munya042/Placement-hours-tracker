@@ -1,4 +1,4 @@
-PLACEMENT HOURS TRACKER — VERSION 2
+PLACEMENT HOURS TRACKER — VERSION 2.1
 
 Included:
 - Google sign-in
@@ -26,3 +26,9 @@ Firestore rules should match firestore.rules in this package.
 GITHUB
 Replace the existing repository files with the files in this package and commit to main.
 GitHub Pages should remain configured to deploy from main / (root).
+
+V2.1 FIX:
+- Removed redirect fallback for Google sign-in on GitHub Pages.
+- Uses popup sign-in only.
+- Shows the exact Firebase error code if sign-in fails.
+- Bumped service worker cache so the update loads immediately.

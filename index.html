@@ -341,17 +341,30 @@ async function initFirebase(){
         try{await reconcileCloud();setSyncState("ok","Cloud sync on",currentUser.email||"Signed in")}catch(e){console.error(e);setSyncState("bad","Sync problem","Your local data is still safe on this device.")}
       }else setSyncState("","Not signed in","Your local data still works offline.");
     });
-    try{await authMod.getRedirectResult(auth)}catch(e){console.warn("Redirect sign-in result:",e)}
   }catch(e){console.error(e);setSyncState("bad","Firebase could not load","Check your internet connection.")}
 }
 $("authBtn").addEventListener("click",async()=>{
   if(!firebase)return alert("Firebase is still loading. Try again in a moment.");
   if(currentUser){await firebase.signOut(firebase.auth);return}
+
   const provider=new firebase.GoogleAuthProvider();
-  try{await firebase.signInWithPopup(firebase.auth,provider)}
-  catch(e){
-    console.warn("Popup sign-in failed, trying redirect.",e);
-    try{await firebase.signInWithRedirect(firebase.auth,provider)}catch(err){console.error(err);alert("Google sign-in could not start. Check that munya042.github.io is listed under Firebase Authentication → Settings → Authorized domains.")}
+  provider.setCustomParameters({prompt:"select_account"});
+
+  try{
+    await firebase.signInWithPopup(firebase.auth,provider);
+  }catch(e){
+    console.error("Google sign-in error:",e);
+    const code=e?.code||"unknown";
+    const message=e?.message||"Unknown error";
+    if(code==="auth/popup-blocked"){
+      alert("Your browser blocked the Google sign-in popup. Please allow popups for this site, then try again.");
+    }else if(code==="auth/popup-closed-by-user"){
+      // User simply closed the chooser; no alert needed.
+    }else if(code==="auth/unauthorized-domain"){
+      alert("Firebase is rejecting this website domain. Check Authentication → Settings → Authorized domains and make sure munya042.github.io is listed.");
+    }else{
+      alert(`Google sign-in failed.\n\nError: ${code}\n\n${message}`);
+    }
   }
 });
 async function reconcileCloud(){
