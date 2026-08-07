@@ -157,23 +157,28 @@ button:disabled{opacity:.35;cursor:not-allowed}
 .report-section{margin-top:18px}.report-section h3{font-size:1rem;margin:0 0 8px;border-bottom:1px solid #ddd;padding-bottom:5px}
 .report-table{width:100%;border-collapse:collapse;font-size:.8rem}.report-table th,.report-table td{border-bottom:1px solid #ddd;padding:7px 5px;text-align:left;vertical-align:top}
 .signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:34px}.signature-line{border-top:1px solid #333;padding-top:5px;font-size:.78rem;color:#555}
-.mobile-timer-bar{display:none}
-@media(max-width:760px){.insights{grid-template-columns:repeat(2,1fr)}.report-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){
-  main{padding-bottom:110px}
-  .mobile-timer-bar{display:grid;grid-template-columns:1fr 1fr;gap:9px;position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:40;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(12px);border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,0,0,.18);padding:8px;border-radius:18px}
-  .mobile-timer-bar button{min-height:56px;border:0;border-radius:13px;color:white;font-weight:900}
-  .mobile-start{background:var(--green)}.mobile-stop{background:var(--red)}
+  main{padding-bottom:34px}
   .week-bars{gap:4px}.week-label{font-size:.6rem}.week-value{font-size:.6rem}
+  .signature-grid{grid-template-columns:1fr;gap:28px}
+}.week-label{font-size:.6rem}.week-value{font-size:.6rem}
   .signature-grid{grid-template-columns:1fr;gap:28px}
 }
 @media print{
-  body.print-report main,body.print-report .modal:not(#reportModal),body.print-report .celebrate,body.print-report .mobile-timer-bar{display:none!important}
+  body.print-report main,body.print-report .modal:not(#reportModal),body.print-report .celebrate{display:none!important}
   body.print-report #reportModal{display:block!important;position:static;background:white}
   body.print-report #reportModal .sheet{max-height:none;width:100%;padding:0;background:white}
   body.print-report #reportModal .modal-actions{display:none!important}
   body.print-report .report-paper{border:0;border-radius:0;padding:0}
 }
+
+
+.shift-reminder{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:70;padding:20px}
+.shift-reminder.open{display:flex}
+.shift-reminder-card{width:min(430px,100%);background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.22)}
+.shift-reminder-card h2{margin:0 0 7px;font-size:1.3rem}
+.shift-reminder-card p{margin:0;color:var(--muted);line-height:1.5}
+.shift-reminder-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}
 
 </style>
 </head>
@@ -183,7 +188,7 @@ button:disabled{opacity:.35;cursor:not-allowed}
     <div class="brand">
       <img src="icon-192.png" alt="">
       <div>
-        <h1>Placement Hours <span class="version">v4.0</span></h1>
+        <h1>Placement Hours <span class="version">v4.1</span></h1>
         <small id="placementNameLabel">Personal placement tracker</small>
         <div id="brandMeta" class="brand-meta"></div><small class="built-by">Built by Munashe</small>
       </div>
@@ -369,9 +374,17 @@ button:disabled{opacity:.35;cursor:not-allowed}
   </div>
 </div>
 
-<div class="mobile-timer-bar">
-  <button id="mobileStart" class="mobile-start" type="button">▶ Start</button>
-  <button id="mobileStop" class="mobile-stop" type="button" disabled>■ Finish</button>
+
+
+<div id="shiftReminder" class="shift-reminder" role="dialog" aria-modal="true">
+  <div class="shift-reminder-card">
+    <h2>8 hours recorded</h2>
+    <p>Your placement timer has been running for 8 hours. If you have finished for today, remember to tap <strong>Finish</strong>. The timer will keep running until you stop it.</p>
+    <div class="shift-reminder-actions">
+      <button id="dismissShiftReminder" class="small-btn" type="button">Keep tracking</button>
+      <button id="finishFromReminder" class="primary" type="button">Finish shift</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -411,7 +424,9 @@ if(!settings.goalHours) settings.goalHours="460";
 let meta=read(META,{localUpdatedAt:0});
 let editingId=null, firebase=null, currentUser=null, syncTimer=null;
 const CELEBRATED="placementTracker.celebrated.v4";
+const SHIFT_REMINDER="placementTracker.shiftReminder.v4.1";
 let celebrated=read(CELEBRATED,[]);
+let reminderShownFor=null;
 
 function persistLocal(touch=true){
   localStorage.setItem(STORAGE,JSON.stringify(records));
@@ -432,11 +447,27 @@ function totalMs(){return records.reduce((a,r)=>a+netMs(r),0)+(active?Date.now()
 function startOfWeek(d){const x=new Date(d);x.setHours(0,0,0,0);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return x}
 function sumSince(from,to){return records.reduce((a,r)=>{const d=new Date(r.start);return d>=from&&d<to?a+netMs(r):a},0)}
 
+
+function maybeShowShiftReminder(now){
+  if(!active)return;
+  const elapsed=now-active;
+  if(elapsed < 8*60*60*1000)return;
+  const key=active.toISOString();
+  const dismissed=localStorage.getItem(SHIFT_REMINDER);
+  if(reminderShownFor===key || dismissed===key)return;
+  reminderShownFor=key;
+  $("shiftReminder").classList.add("open");
+}
+
 function updateClock(){
   const n=new Date();
   $("date").textContent=n.toLocaleDateString([],{weekday:"short",day:"numeric",month:"short"});
   $("clock").textContent=n.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
-  if(active){$("timer").textContent=formatDur(n-active,true);$("status").textContent=`Tracking placement hours — started ${time(active)}`}
+  if(active){
+    $("timer").textContent=formatDur(n-active,true);
+    $("status").textContent=`Tracking placement hours — started ${time(active)}`;
+    maybeShowShiftReminder(n);
+  }
   else if($("timer").textContent==="00:00:00") $("status").textContent="Ready to start";
   updateSummary();
 }
@@ -599,7 +630,7 @@ function renderCalendar(){
 }
 
 function render(){
-  $("startBtn").disabled=!!active;$("stopBtn").disabled=!active;$("mobileStart").disabled=!!active;$("mobileStop").disabled=!active;
+  $("startBtn").disabled=!!active;$("stopBtn").disabled=!active;
   updateSummary();renderHistory();renderCalendar();applyTheme();
 }
 
@@ -631,15 +662,25 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":
 function applyTheme(){document.documentElement.dataset.theme=settings.theme==="dark"?"dark":"light";$("themeBtn").textContent=settings.theme==="dark"?"Light":"Dark"}
 
 function startTracking(){
-  if(active)return;active=new Date();localStorage.setItem(ACTIVE,active.toISOString());$("timer").textContent="00:00:00";persistLocal();
+  if(active)return;active=new Date();reminderShownFor=null;localStorage.removeItem(SHIFT_REMINDER);localStorage.setItem(ACTIVE,active.toISOString());$("timer").textContent="00:00:00";persistLocal();
 }
 function stopTracking(){
   if(!active)return;const f=new Date();
   records.push({id:uid(),start:active.toISOString(),finish:f.toISOString(),breakMinutes:0,notes:"",updatedAt:Date.now()});
-  active=null;localStorage.removeItem(ACTIVE);$("timer").textContent="00:00:00";$("status").textContent="Shift completed";persistLocal();
+  active=null;reminderShownFor=null;localStorage.removeItem(SHIFT_REMINDER);localStorage.removeItem(ACTIVE);$("shiftReminder").classList.remove("open");$("timer").textContent="00:00:00";$("status").textContent="Shift completed";persistLocal();
 }
-$("startBtn").addEventListener("click",startTracking);$("mobileStart").addEventListener("click",startTracking);
-$("stopBtn").addEventListener("click",stopTracking);$("mobileStop").addEventListener("click",stopTracking);
+
+$("dismissShiftReminder").addEventListener("click",()=>{
+  if(active)localStorage.setItem(SHIFT_REMINDER,active.toISOString());
+  $("shiftReminder").classList.remove("open");
+});
+$("finishFromReminder").addEventListener("click",()=>{
+  $("shiftReminder").classList.remove("open");
+  stopTracking();
+});
+
+$("startBtn").addEventListener("click",startTracking);
+$("stopBtn").addEventListener("click",stopTracking);
 
 function openShift(r=null){
   editingId=r?.id||null;$("shiftTitle").textContent=r?"Edit shift":"Add previous shift";$("deleteShift").hidden=!r;

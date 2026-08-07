@@ -1,4 +1,4 @@
-PLACEMENT HOURS — VERSION 4.0
+PLACEMENT HOURS — VERSION 4.1
 
 V3.0 includes:
 - Minimalist redesigned dashboard
@@ -50,3 +50,10 @@ V4.0 RELEASE CANDIDATE
 - Optional skills / competencies / reflection summary in Settings
 - Mobile sticky Start / Finish controls
 - Existing V3.1 functionality retained
+
+V4.1
+- Removed fixed bottom Start / Finish controls on mobile
+- Added dismissible 8-hour shift reminder
+- Timer never stops automatically
+- Reminder offers Keep tracking or Finish shift
+- Reminder appears only once per running shift after being dismissed
