@@ -3,67 +3,190 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#166534">
+<meta name="theme-color" content="#0f766e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Placement Hours">
-<title>Placement Hours Tracker</title>
+<title>Placement Hours</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
-:root{
-  color-scheme:light;
-  --bg:#f3f6f4;--card:#fff;--text:#17201c;--muted:#66736b;--border:#d8e0db;
-  --green:#15803d;--green2:#166534;--red:#b91c1c;--blue:#2563eb;--amber:#b45309;
-  --shadow:0 8px 30px rgba(0,0,0,.06)
+:root {
+  color-scheme: light;
+  --bg:#f5f7f6;
+  --panel:#ffffff;
+  --panel-2:#f8faf9;
+  --text:#15211b;
+  --muted:#6c776f;
+  --border:#dce4df;
+  --accent:#0f766e;
+  --accent-2:#115e59;
+  --green:#15803d;
+  --red:#b91c1c;
+  --blue:#2563eb;
+  --shadow:0 10px 28px rgba(22,34,27,.06);
 }
-:root[data-theme="dark"]{
-  color-scheme:dark;--bg:#0f1511;--card:#18211b;--text:#eef4f0;--muted:#a7b3ab;
-  --border:#33423a;--shadow:none
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#0f1512;
+  --panel:#18211c;
+  --panel-2:#121a16;
+  --text:#edf4ef;
+  --muted:#a5b1a9;
+  --border:#314038;
+  --shadow:none;
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{width:min(900px,100%);margin:auto;padding:max(14px,env(safe-area-inset-top)) 14px max(30px,env(safe-area-inset-bottom))}
-button,input{font:inherit}
+button,input,textarea,select{font:inherit}
 button{cursor:pointer;touch-action:manipulation}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 14px}
-.brand{display:flex;align-items:center;gap:10px}.brand h1{margin:0;font-size:1.38rem}.brand small{display:block;color:var(--muted)}
+a{color:inherit}
+main{width:min(980px,100%);margin:auto;padding:max(16px,env(safe-area-inset-top)) 14px max(34px,env(safe-area-inset-bottom))}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand img{width:44px;height:44px;border-radius:12px}
+.brand h1{font-size:1.35rem;margin:0;white-space:nowrap}
+.brand small{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55vw}.brand-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:2px}.brand-chip{font-size:.72rem;color:var(--muted);background:var(--panel-2);border:1px solid var(--border);padding:3px 7px;border-radius:999px}
 .top-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
-.small-btn,.icon-btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:12px;padding:9px 11px;font-weight:700}
-.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
-.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.metric .label{font-size:.78rem;color:var(--muted);margin-bottom:5px}.metric .value{font-size:1.12rem;font-weight:800}
-.progress-wrap{margin-top:10px}.progress-track{height:10px;border-radius:999px;background:var(--bg);overflow:hidden}.progress-fill{height:100%;background:var(--green);width:0%;transition:width .25s}.progress-text{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.8rem;margin-top:5px}
-.timer-card{margin-top:10px;text-align:center}.status{color:var(--muted);margin-bottom:8px}.timer{font-size:clamp(2.7rem,12vw,4.8rem);font-weight:900;letter-spacing:.03em}
-.big-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.big{min-height:122px;border:0;border-radius:24px;color:white;font-size:1.8rem;font-weight:900}.start{background:var(--green)}.stop{background:var(--red)}button:disabled{opacity:.34;cursor:not-allowed}
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.action{min-height:50px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:750}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
-.section{margin-top:10px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.section h2{font-size:1.06rem;margin:0}
-.search{flex:1;min-width:180px;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:12px;padding:10px 12px}
-.record{display:grid;grid-template-columns:1.25fr .85fr .85fr .85fr auto;gap:8px;align-items:center;padding:12px 0;border-top:1px solid var(--border);font-size:.88rem}
-.record button{border:0;background:transparent;color:var(--blue);font-weight:700;padding:6px}.empty{text-align:center;color:var(--muted);padding:22px 0}
-.sync-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:var(--card)}
-.sync-left{display:flex;align-items:center;gap:9px}.dot{width:10px;height:10px;border-radius:50%;background:var(--amber)}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
-.sync-text{font-size:.88rem}.sync-text small{display:block;color:var(--muted)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:20}.modal.open{display:flex}.sheet{width:min(700px,100%);max-height:94vh;overflow:auto;background:var(--card);border-radius:22px 22px 0 0;padding:18px}.sheet h2{margin:0 0 14px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field span{display:block;color:var(--muted);font-size:.82rem;margin-bottom:5px}.input-wrap{border:1px solid var(--border);background:var(--bg);border-radius:12px;padding:10px}.input-wrap input{width:100%;border:0;outline:0;background:transparent;color:var(--text)}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}.primary,.danger{border:0;border-radius:12px;padding:11px 15px;color:white;font-weight:800}.primary{background:var(--green)}.danger{background:var(--red)}
-.note{font-size:.8rem;color:var(--muted)}.signed-user{display:flex;align-items:center;gap:10px;margin:10px 0}.avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--bg)}
+.icon-btn,.small-btn,.link-btn{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:12px;padding:9px 11px;font-weight:750;text-decoration:none}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.progress-card{padding:20px;display:flex;flex-direction:column;min-height:100%}
+.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}
+.goal-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:5px}.goal-copy{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.goal-caption{font-size:.85rem;color:var(--muted);font-weight:750;margin-top:2px}
+.goal-main{font-size:clamp(2.5rem,8vw,4.25rem);font-weight:950;letter-spacing:-.055em;line-height:1}
+.goal-total{font-size:1.05rem;color:var(--muted);font-weight:800}
+.progress-track{height:14px;border-radius:999px;background:var(--panel-2);overflow:hidden;margin-top:16px;border:1px solid var(--border)}
+.progress-fill{height:100%;width:0;background:var(--accent);transition:width .25s ease}
+.progress-meta{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.87rem;margin-top:8px;flex-wrap:wrap}.forecast{margin-top:auto;padding-top:16px}.forecast-box{background:var(--panel-2);border:1px solid var(--border);border-radius:15px;padding:13px 14px}.forecast-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:850}.forecast-main{font-size:1.05rem;font-weight:900;margin-top:4px}.forecast-sub{color:var(--muted);font-size:.82rem;margin-top:3px}
+.timer-card{text-align:center;display:flex;flex-direction:column;justify-content:center;padding:20px;border-color:color-mix(in srgb,var(--accent) 18%,var(--border))}
+.timer-top{display:flex;justify-content:space-between;color:var(--muted);font-size:.82rem;gap:8px}
+.status{margin-top:10px;color:var(--muted);font-weight:650}
+.timer{font-size:clamp(3.4rem,11vw,5.5rem);font-weight:950;letter-spacing:.015em;line-height:1;margin:10px 0 18px}
+.big-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big{min-height:78px;border:0;border-radius:18px;color:white;font-size:1.08rem;font-weight:950;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s ease,filter .15s ease}.big:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.03)}
+.big .symbol{font-size:1.35rem}
+.start{background:var(--green)}
+.stop{background:var(--red)}
+button:disabled{opacity:.35;cursor:not-allowed}
+.sync-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding:11px 13px;border-radius:14px;border:1px solid var(--border);background:var(--panel)}
+.sync-left{display:flex;align-items:center;gap:9px;min-width:0}
+.dot{width:10px;height:10px;border-radius:50%;background:#b7791f;flex:0 0 auto}
+.dot.ok{background:var(--green)} .dot.bad{background:var(--red)}
+.sync-text{font-size:.88rem;min-width:0} .sync-text small{display:block;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.metric .label{font-size:.78rem;color:var(--muted);margin-bottom:5px}
+.metric .value{font-size:1.22rem;font-weight:900}
+.actions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.action{min-height:48px;border-radius:14px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-weight:780}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.section h2{font-size:1.05rem;margin:0}
+.search{flex:1;min-width:180px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);border-radius:12px;padding:10px 12px}
+.record{display:grid;grid-template-columns:1.25fr .8fr .8fr .8fr auto;gap:8px;align-items:center;padding:12px 0;border-top:1px solid var(--border);font-size:.88rem}
+.record .note-line{grid-column:1/-1;color:var(--muted);font-size:.8rem;margin-top:-4px}
+.record button{border:0;background:transparent;color:var(--blue);font-weight:800;padding:6px}
+.empty{text-align:center;color:var(--muted);padding:22px 0}
+.milestones{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.milestone{background:var(--panel-2);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;position:relative}.milestone.next{border-color:var(--accent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 30%,transparent)}
+.milestone.done{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%, var(--panel))}.milestone-badge{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;font-size:.68rem;font-weight:850;background:var(--panel);border:1px solid var(--border);color:var(--muted)}.milestone.next .milestone-badge{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}.milestone.done .milestone-badge{color:var(--green)}
+.milestone strong{display:block;font-size:1.05rem}
+.milestone small{color:var(--muted)}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:10px}
+.cal-head{text-align:center;color:var(--muted);font-size:.72rem;font-weight:800}
+.cal-day{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--panel-2);font-size:.8rem;border:1px solid transparent}
+.cal-day.has{background:color-mix(in srgb,var(--accent) 15%, var(--panel));border-color:color-mix(in srgb,var(--accent) 35%, var(--border));font-weight:800}
+.cal-day.today{outline:2px solid var(--accent);outline-offset:1px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.52);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.open{display:flex}
+.sheet{width:min(720px,100%);max-height:94vh;overflow:auto;background:var(--panel);border-radius:22px 22px 0 0;padding:18px}
+.sheet h2{margin:0 0 14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field span{display:block;color:var(--muted);font-size:.82rem;margin-bottom:5px}
+.input-wrap{border:1px solid var(--border);background:var(--panel-2);border-radius:12px;padding:10px}
+.input-wrap input,.input-wrap textarea{width:100%;border:0;outline:0;background:transparent;color:var(--text);resize:vertical}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+.primary,.danger{border:0;border-radius:12px;padding:11px 15px;color:white;font-weight:800}
+.primary{background:var(--accent)} .danger{background:var(--red)}
+.note{font-size:.8rem;color:var(--muted)}
+.signed-user{display:flex;align-items:center;gap:10px;margin:10px 0}
+.avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--panel-2)}
+.info-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.info-links a{text-decoration:none;border:1px solid var(--border);border-radius:14px;padding:12px;background:var(--panel-2);font-weight:800}
+.info-links small{display:block;color:var(--muted);font-weight:500;margin-top:2px}
 .notice{text-align:center;color:var(--muted);font-size:.76rem;margin-top:12px}
-@media(max-width:700px){.dashboard{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:1fr}.actions{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:540px){.big-buttons{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.record{grid-template-columns:1.2fr .8fr .8fr}.record .hours{grid-column:1/-2}.form-grid{grid-template-columns:1fr}.topbar{align-items:flex-start}.top-actions{max-width:45%}}
+.version{font-size:.72rem;color:var(--muted);margin-left:5px}
+@media(max-width:760px){.hero,.grid-2{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.actions{grid-template-columns:repeat(2,1fr)}.milestones{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.big-buttons{grid-template-columns:1fr 1fr}.form-grid,.info-links{grid-template-columns:1fr}.topbar{align-items:flex-start}.top-actions{max-width:48%}.goal-main{font-size:3.25rem}.timer{font-size:3.65rem}.progress-card,.timer-card{padding:16px}}
 @media print{
-  body{background:white;color:black} .top-actions,.sync-banner,.timer-card,.actions,.search,.record button,.notice{display:none!important}
-  main{width:100%;padding:0}.card{box-shadow:none;border-color:#ddd}.section{margin-top:18px}.dashboard,.stats{grid-template-columns:repeat(3,1fr)}
+  body{background:#fff;color:#000} .top-actions,.sync-banner,.timer-card,.actions,.search,.shift-actions,.notice{display:none!important}
+  main{width:100%;padding:0} .card{box-shadow:none;border-color:#ddd} .hero,.grid-2{display:block} .metrics{grid-template-columns:repeat(4,1fr)}
 }
+
+.built-by{font-size:.69rem!important;margin-top:3px}
+.insights{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.insight-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.insight-card .k{font-size:.76rem;color:var(--muted)}
+.insight-card .v{font-size:1.18rem;font-weight:950;margin-top:4px}
+.chart-card{margin-top:12px}
+.week-bars{height:170px;display:grid;grid-template-columns:repeat(8,1fr);gap:8px;align-items:end;padding-top:14px}
+.week-col{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;min-width:0;height:100%}
+.week-bar-wrap{height:125px;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.week-bar{width:min(34px,70%);min-height:3px;background:var(--accent);border-radius:9px 9px 4px 4px;transition:height .25s ease}
+.week-value{font-size:.68rem;font-weight:800;color:var(--muted);white-space:nowrap}
+.week-label{font-size:.68rem;color:var(--muted);white-space:nowrap}
+.celebrate{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.celebrate.open{display:flex}
+.celebrate-card{width:min(430px,100%);background:var(--panel);border:1px solid var(--border);border-radius:24px;padding:26px;text-align:center;box-shadow:0 28px 80px rgba(0,0,0,.24);position:relative;overflow:hidden}
+.celebrate-icon{font-size:3rem}
+.celebrate-card h2{margin:8px 0 5px;font-size:1.45rem}
+.celebrate-card p{margin:0;color:var(--muted)}
+.celebrate-card button{margin-top:18px}
+.spark{position:absolute;width:9px;height:18px;border-radius:3px;background:var(--accent);opacity:.65;animation:fall 1.8s linear infinite}
+.spark:nth-child(2n){background:var(--green)}
+.spark:nth-child(3n){background:#d97706}
+@keyframes fall{0%{transform:translateY(-60px) rotate(0)}100%{transform:translateY(460px) rotate(360deg)}}
+.report-modal .sheet{width:min(900px,100%)}
+.report-paper{background:white;color:#111;border-radius:16px;padding:28px;border:1px solid #ddd}
+.report-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;border-bottom:2px solid #111;padding-bottom:14px}
+.report-brand{display:flex;gap:12px;align-items:center}.report-brand img{width:48px;height:48px;border-radius:11px}
+.report-title{font-size:1.5rem;font-weight:900}.report-sub{font-size:.86rem;color:#555}
+.report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.report-stat{border:1px solid #ddd;border-radius:10px;padding:10px}.report-stat span{display:block;color:#666;font-size:.76rem}.report-stat strong{display:block;font-size:1.05rem;margin-top:2px}
+.report-section{margin-top:18px}.report-section h3{font-size:1rem;margin:0 0 8px;border-bottom:1px solid #ddd;padding-bottom:5px}
+.report-table{width:100%;border-collapse:collapse;font-size:.8rem}.report-table th,.report-table td{border-bottom:1px solid #ddd;padding:7px 5px;text-align:left;vertical-align:top}
+.signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:34px}.signature-line{border-top:1px solid #333;padding-top:5px;font-size:.78rem;color:#555}
+.mobile-timer-bar{display:none}
+@media(max-width:760px){.insights{grid-template-columns:repeat(2,1fr)}.report-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){
+  main{padding-bottom:110px}
+  .mobile-timer-bar{display:grid;grid-template-columns:1fr 1fr;gap:9px;position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:40;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(12px);border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,0,0,.18);padding:8px;border-radius:18px}
+  .mobile-timer-bar button{min-height:56px;border:0;border-radius:13px;color:white;font-weight:900}
+  .mobile-start{background:var(--green)}.mobile-stop{background:var(--red)}
+  .week-bars{gap:4px}.week-label{font-size:.6rem}.week-value{font-size:.6rem}
+  .signature-grid{grid-template-columns:1fr;gap:28px}
+}
+@media print{
+  body.print-report main,body.print-report .modal:not(#reportModal),body.print-report .celebrate,body.print-report .mobile-timer-bar{display:none!important}
+  body.print-report #reportModal{display:block!important;position:static;background:white}
+  body.print-report #reportModal .sheet{max-height:none;width:100%;padding:0;background:white}
+  body.print-report #reportModal .modal-actions{display:none!important}
+  body.print-report .report-paper{border:0;border-radius:0;padding:0}
+}
+
 </style>
 </head>
 <body>
 <main>
   <header class="topbar">
     <div class="brand">
-      <img src="icon-192.png" alt="" width="42" height="42" style="border-radius:11px">
-      <div><h1>Placement Hours</h1><small id="placementNameLabel">Personal placement tracker</small></div>
+      <img src="icon-192.png" alt="">
+      <div>
+        <h1>Placement Hours <span class="version">v4.0</span></h1>
+        <small id="placementNameLabel">Personal placement tracker</small>
+        <div id="brandMeta" class="brand-meta"></div><small class="built-by">Built by Munashe</small>
+      </div>
     </div>
     <div class="top-actions">
       <button id="themeBtn" class="icon-btn" type="button">Dark</button>
@@ -72,56 +195,97 @@ button{cursor:pointer;touch-action:manipulation}
   </header>
 
   <div class="sync-banner">
-    <div class="sync-left"><span id="syncDot" class="dot"></span><div id="syncText" class="sync-text">Not signed in<small>Your local data still works offline.</small></div></div>
+    <div class="sync-left">
+      <span id="syncDot" class="dot"></span>
+      <div id="syncText" class="sync-text">Not signed in<small>Your local data still works offline.</small></div>
+    </div>
     <button id="authBtn" class="small-btn" type="button">Sign in with Google</button>
   </div>
 
-  <section class="dashboard">
-    <div class="card metric"><div class="label">Total hours</div><div id="totalHours" class="value">0h 00m</div></div>
-    <div class="card metric"><div class="label">Total days</div><div id="totalDays" class="value">0</div></div>
+  <section class="hero">
+    <div class="card progress-card">
+      <div class="eyebrow">Placement progress</div>
+      <div class="goal-line">
+        <div class="goal-copy">
+          <div id="goalCompleted" class="goal-main">0.0</div>
+          <div class="goal-total">hours</div>
+        </div>
+      </div>
+      <div id="goalTotal" class="goal-caption">of 460 required hours</div>
+      <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+      <div class="progress-meta">
+        <span id="progressPercent">0% complete</span>
+        <span id="progressRemaining">460 hours remaining</span>
+      </div>
+      <div class="forecast">
+        <div class="forecast-box">
+          <div class="forecast-title">Completion forecast</div>
+          <div id="forecastMain" class="forecast-main">Add a target date in Settings</div>
+          <div id="forecastSub" class="forecast-sub">We'll calculate the weekly pace needed to reach your goal.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card timer-card">
+      <div class="timer-top"><span id="date">—</span><span id="clock">—</span></div>
+      <div id="status" class="status">Ready to start</div>
+      <div id="timer" class="timer">00:00:00</div>
+      <div class="big-buttons">
+        <button id="startBtn" class="big start" type="button"><span class="symbol">▶</span> Start</button>
+        <button id="stopBtn" class="big stop" type="button" disabled><span class="symbol">■</span> Finish</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="metrics">
     <div class="card metric"><div class="label">This week</div><div id="weekHours" class="value">0h 00m</div></div>
     <div class="card metric"><div class="label">This month</div><div id="monthHours" class="value">0h 00m</div></div>
-  </section>
-
-  <section class="card progress-wrap">
-    <div class="label" style="font-size:.82rem;color:var(--muted)">Placement progress</div>
-    <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
-    <div class="progress-text"><span id="progressDone">0 hours completed</span><span id="progressRemaining">Set a target in Settings</span></div>
-  </section>
-
-  <section class="card timer-card">
-    <div style="display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:.86rem"><span id="date">—</span><span id="clock">—</span></div>
-    <div id="status" class="status">Ready to start</div>
-    <div id="timer" class="timer">00:00:00</div>
-    <div class="big-buttons">
-      <button id="startBtn" class="big start" type="button">START</button>
-      <button id="stopBtn" class="big stop" type="button" disabled>STOP</button>
-    </div>
+    <div class="card metric"><div class="label">Total hours</div><div id="totalHours" class="value">0h 00m</div></div>
+    <div class="card metric"><div class="label">Placement days</div><div id="totalDays" class="value">0</div></div>
   </section>
 
   <section class="actions">
     <button id="addBtn" class="action" type="button">＋ Add previous shift</button>
     <button id="csvBtn" class="action" type="button">Export CSV</button>
     <button id="pdfBtn" class="action" type="button">Print / PDF</button>
+    <button id="reportBtn" class="action" type="button">Professional Report</button>
     <button id="backupBtn" class="action" type="button">Backup / Restore</button>
   </section>
 
-  <section class="stats">
-    <div class="card metric"><div class="label">Average per day</div><div id="avgHours" class="value">0h 00m</div></div>
-    <div class="card metric"><div class="label">Longest day</div><div id="longestHours" class="value">0h 00m</div></div>
-    <div class="card metric"><div class="label">Completed shifts</div><div id="shiftCount" class="value">0</div></div>
+  <section class="insights">
+    <div class="insight-card"><div class="k">Average shift</div><div id="avgShift" class="v">0h 00m</div></div>
+    <div class="insight-card"><div class="k">Average per week</div><div id="avgWeek" class="v">0h 00m</div></div>
+    <div class="insight-card"><div class="k">Longest shift</div><div id="longestShift" class="v">0h 00m</div></div>
+    <div class="insight-card"><div class="k">Placement streak</div><div id="placementStreak" class="v">0 days</div></div>
   </section>
 
-  <section class="card section">
+  <section class="card section chart-card">
+    <div class="section-head"><h2>Last 8 weeks</h2><span class="note">Completed placement hours</span></div>
+    <div id="weekBars" class="week-bars"></div>
+  </section>
+
+  <section class="grid-2">
+    <div class="card section">
+      <div class="section-head"><h2>Milestones</h2></div>
+      <div id="milestones" class="milestones"></div>
+    </div>
+
+    <div class="card section">
+      <div class="section-head"><h2 id="calendarTitle">This month</h2></div>
+      <div id="calendar" class="calendar"></div>
+    </div>
+  </section>
+
+  <section class="card section" style="margin-top:12px">
     <div class="section-head">
-      <h2>History</h2>
-      <input id="searchBox" class="search" type="search" placeholder="Search by date, e.g. Aug or 07/08">
+      <h2>Recent shifts</h2>
+      <input id="searchBox" class="search" type="search" placeholder="Search date or notes">
       <button id="clearBtn" class="small-btn" type="button">Clear all</button>
     </div>
-    <div id="history"></div>
+    <div id="history" class="shift-list"></div>
   </section>
 
-  <p class="notice">Local data remains available offline. When signed in, the latest saved version is also stored in your private Firebase record.</p>
+  <p class="notice">Your device keeps an offline copy. When signed in, your latest saved version is also stored in your private Firebase record.</p>
 </main>
 
 <div id="shiftModal" class="modal" role="dialog" aria-modal="true">
@@ -132,6 +296,7 @@ button{cursor:pointer;touch-action:manipulation}
       <label class="field"><span>Start time</span><div class="input-wrap"><input id="shiftStart" type="time"></div></label>
       <label class="field"><span>Finish time</span><div class="input-wrap"><input id="shiftFinish" type="time"></div></label>
       <label class="field"><span>Unpaid break (minutes)</span><div class="input-wrap"><input id="shiftBreak" type="number" min="0" step="1" value="0"></div></label>
+      <label class="field" style="grid-column:1/-1"><span>Shift notes (optional)</span><div class="input-wrap"><textarea id="shiftNotes" rows="3" placeholder="Example: induction, client visits, report writing..."></textarea></div></label>
     </div>
     <div class="modal-actions">
       <button id="cancelShift" class="small-btn" type="button">Cancel</button>
@@ -145,11 +310,24 @@ button{cursor:pointer;touch-action:manipulation}
   <div class="sheet">
     <h2>Settings</h2>
     <div class="form-grid">
-      <label class="field"><span>Placement name (optional)</span><div class="input-wrap"><input id="placementName" placeholder="Example: Community Placement"></div></label>
-      <label class="field"><span>Required placement hours</span><div class="input-wrap"><input id="goalHours" type="number" min="0" step=".5" placeholder="Example: 400"></div></label>
+      <label class="field"><span>Placement name</span><div class="input-wrap"><input id="placementName" placeholder="Example: Community Placement"></div></label>
+      <label class="field"><span>Programme / qualification</span><div class="input-wrap"><input id="qualification" placeholder="Example: Bachelor of Social Work"></div></label>
+      <label class="field"><span>Organisation</span><div class="input-wrap"><input id="organisation" placeholder="Placement organisation"></div></label>
+      <label class="field"><span>Supervisor</span><div class="input-wrap"><input id="supervisor" placeholder="Supervisor name"></div></label>
+      <label class="field"><span>Required placement hours</span><div class="input-wrap"><input id="goalHours" type="number" min="0" step=".5" value="460"></div></label>
+      <label class="field"><span>Placement start date</span><div class="input-wrap"><input id="placementStart" type="date"></div></label>
+      <label class="field"><span>Target completion date</span><div class="input-wrap"><input id="placementDeadline" type="date"></div></label>
+      <label class="field" style="grid-column:1/-1"><span>Skills / competencies / reflection summary (optional)</span><div class="input-wrap"><textarea id="professionalSummary" rows="4" placeholder="Key skills, competencies, learning or reflections you want included in your professional report."></textarea></div></label>
     </div>
+
     <div id="userArea"></div>
-    <p class="note">Your Firebase configuration is already built into this version. You do not need to paste API keys into the app.</p>
+
+    <div class="info-links">
+      <a href="about.html">📖 About<small>What Placement Hours does</small></a>
+      <a href="privacy.html">🔒 Privacy Policy<small>How app data is handled</small></a>
+    </div>
+
+    <p class="note" style="margin-top:12px">Placement records sync to Firebase when you are signed in and online.</p>
     <div class="modal-actions"><button id="closeSettings" class="primary" type="button">Save & close</button></div>
   </div>
 </div>
@@ -157,7 +335,7 @@ button{cursor:pointer;touch-action:manipulation}
 <div id="backupModal" class="modal" role="dialog" aria-modal="true">
   <div class="sheet">
     <h2>Backup and restore</h2>
-    <p>Download a JSON backup before changing phones or clearing website data. Cloud sync is helpful, but a separate backup is still good practice.</p>
+    <p>Download a JSON backup before changing phones or clearing site data. Cloud sync helps, but a separate backup is still useful.</p>
     <div class="actions">
       <button id="downloadBackup" class="action" type="button">Download backup</button>
       <button id="restoreBackup" class="action" type="button">Restore backup</button>
@@ -165,6 +343,35 @@ button{cursor:pointer;touch-action:manipulation}
     </div>
     <input id="restoreFile" type="file" accept="application/json" hidden>
   </div>
+</div>
+
+
+<div id="reportModal" class="modal report-modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div id="reportPaper" class="report-paper"></div>
+    <div class="modal-actions">
+      <button id="closeReport" class="small-btn" type="button">Close</button>
+      <button id="printReport" class="primary" type="button">Print / Save as PDF</button>
+    </div>
+  </div>
+</div>
+
+<div id="celebrateModal" class="celebrate" role="dialog" aria-modal="true">
+  <div class="celebrate-card">
+    <span class="spark" style="left:8%;animation-delay:.1s"></span><span class="spark" style="left:18%;animation-delay:.5s"></span>
+    <span class="spark" style="left:31%;animation-delay:.2s"></span><span class="spark" style="left:46%;animation-delay:.8s"></span>
+    <span class="spark" style="left:58%;animation-delay:.4s"></span><span class="spark" style="left:72%;animation-delay:.7s"></span>
+    <span class="spark" style="left:86%;animation-delay:.3s"></span>
+    <div class="celebrate-icon">🎉</div>
+    <h2 id="celebrateTitle">Milestone reached</h2>
+    <p id="celebrateText"></p>
+    <button id="closeCelebrate" class="primary" type="button">Continue</button>
+  </div>
+</div>
+
+<div class="mobile-timer-bar">
+  <button id="mobileStart" class="mobile-start" type="button">▶ Start</button>
+  <button id="mobileStop" class="mobile-stop" type="button" disabled>■ Finish</button>
 </div>
 
 <script type="module">
@@ -177,15 +384,35 @@ const firebaseConfig = {
   appId: "1:1049340690058:web:2d493f342746c17429f773"
 };
 
-const STORAGE="placementTracker.records.v3", ACTIVE="placementTracker.active.v3", SETTINGS="placementTracker.settings.v3", META="placementTracker.meta.v3";
+const STORAGE="placementTracker.records.v4";
+const ACTIVE="placementTracker.active.v4";
+const SETTINGS="placementTracker.settings.v4";
+const META="placementTracker.meta.v4";
+const OLD_STORAGE="placementTracker.records.v3";
+const OLD_ACTIVE="placementTracker.active.v3";
+const OLD_SETTINGS="placementTracker.settings.v3";
+const OLD_META="placementTracker.meta.v3";
+
 const $=id=>document.getElementById(id);
-let records=read(STORAGE,[]);
-let active=localStorage.getItem(ACTIVE)?new Date(localStorage.getItem(ACTIVE)):null;
-let settings=read(SETTINGS,{goalHours:"",placementName:"",theme:"light"});
-let meta=read(META,{localUpdatedAt:0});
-let editingId=null, firebase=null, currentUser=null, syncTimer=null;
 
 function read(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
+function migrate(){
+  if(!localStorage.getItem(STORAGE) && localStorage.getItem(OLD_STORAGE)) localStorage.setItem(STORAGE,localStorage.getItem(OLD_STORAGE));
+  if(!localStorage.getItem(ACTIVE) && localStorage.getItem(OLD_ACTIVE)) localStorage.setItem(ACTIVE,localStorage.getItem(OLD_ACTIVE));
+  if(!localStorage.getItem(SETTINGS) && localStorage.getItem(OLD_SETTINGS)) localStorage.setItem(SETTINGS,localStorage.getItem(OLD_SETTINGS));
+  if(!localStorage.getItem(META) && localStorage.getItem(OLD_META)) localStorage.setItem(META,localStorage.getItem(OLD_META));
+}
+migrate();
+
+let records=read(STORAGE,[]);
+let active=localStorage.getItem(ACTIVE)?new Date(localStorage.getItem(ACTIVE)):null;
+let settings={goalHours:"460",placementName:"",qualification:"",organisation:"",supervisor:"",placementStart:"",placementDeadline:"",professionalSummary:"",theme:"light",...read(SETTINGS,{})};
+if(!settings.goalHours) settings.goalHours="460";
+let meta=read(META,{localUpdatedAt:0});
+let editingId=null, firebase=null, currentUser=null, syncTimer=null;
+const CELEBRATED="placementTracker.celebrated.v4";
+let celebrated=read(CELEBRATED,[]);
+
 function persistLocal(touch=true){
   localStorage.setItem(STORAGE,JSON.stringify(records));
   localStorage.setItem(SETTINGS,JSON.stringify(settings));
@@ -207,99 +434,293 @@ function sumSince(from,to){return records.reduce((a,r)=>{const d=new Date(r.star
 
 function updateClock(){
   const n=new Date();
-  $("date").textContent=n.toLocaleDateString([],{weekday:"short",day:"numeric",month:"short",year:"numeric"});
-  $("clock").textContent=n.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
-  if(active){$("timer").textContent=formatDur(n-active,true);$("status").textContent=`Working — started ${time(active)}`}
+  $("date").textContent=n.toLocaleDateString([],{weekday:"short",day:"numeric",month:"short"});
+  $("clock").textContent=n.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  if(active){$("timer").textContent=formatDur(n-active,true);$("status").textContent=`Tracking placement hours — started ${time(active)}`}
+  else if($("timer").textContent==="00:00:00") $("status").textContent="Ready to start";
   updateSummary();
 }
+
 function updateSummary(){
-  const now=new Date(), total=totalMs();
-  const weekStart=startOfWeek(now), nextWeek=new Date(weekStart);nextWeek.setDate(nextWeek.getDate()+7);
-  const monthStart=new Date(now.getFullYear(),now.getMonth(),1), nextMonth=new Date(now.getFullYear(),now.getMonth()+1,1);
+  const now=new Date(),total=totalMs(),done=total/3600000;
+  const weekStart=startOfWeek(now),nextWeek=new Date(weekStart);nextWeek.setDate(nextWeek.getDate()+7);
+  const monthStart=new Date(now.getFullYear(),now.getMonth(),1),nextMonth=new Date(now.getFullYear(),now.getMonth()+1,1);
   const days=new Set(records.map(r=>dayKey(new Date(r.start))));if(active)days.add(dayKey(active));
-  const dayTotals={};records.forEach(r=>{const k=dayKey(new Date(r.start));dayTotals[k]=(dayTotals[k]||0)+netMs(r)});
-  $("totalHours").textContent=formatDur(total);$("totalDays").textContent=days.size;
-  $("weekHours").textContent=formatDur(sumSince(weekStart,nextWeek));$("monthHours").textContent=formatDur(sumSince(monthStart,nextMonth));
-  $("avgHours").textContent=formatDur(days.size?total/days.size:0);
-  $("longestHours").textContent=formatDur(Math.max(0,...Object.values(dayTotals)));
-  $("shiftCount").textContent=records.length;
-  const goal=Number(settings.goalHours)||0, done=total/3600000;
-  $("progressDone").textContent=`${done.toFixed(2)} hours completed`;
-  if(goal){
-    $("progressFill").style.width=`${Math.min(100,(done/goal)*100)}%`;
-    $("progressRemaining").textContent=`${Math.max(0,goal-done).toFixed(2)} hours remaining`;
-  }else{
-    $("progressFill").style.width="0%";$("progressRemaining").textContent="Set a target in Settings";
-  }
+  $("weekHours").textContent=formatDur(sumSince(weekStart,nextWeek));
+  $("monthHours").textContent=formatDur(sumSince(monthStart,nextMonth));
+  $("totalHours").textContent=formatDur(total);
+  $("totalDays").textContent=days.size;
+
+  const goal=Number(settings.goalHours)||460;
+  const remaining=Math.max(0,goal-done);
+  const pct=goal?Math.min(100,(done/goal)*100):0;
+  $("goalCompleted").textContent=done.toFixed(1);
+  $("goalTotal").textContent=`of ${goal} required hours`;
+  $("progressFill").style.width=`${pct}%`;
+  $("progressPercent").textContent=`${pct.toFixed(1)}% complete`;
+  $("progressRemaining").textContent=remaining<=0?"Goal completed":`${remaining.toFixed(1)} hours remaining`;
   $("placementNameLabel").textContent=settings.placementName||"Personal placement tracker";
+
+  const meta=[];
+  if(settings.qualification) meta.push(settings.qualification);
+  if(settings.organisation) meta.push(settings.organisation);
+  $("brandMeta").innerHTML=meta.slice(0,2).map(x=>`<span class="brand-chip">${escapeHtml(x)}</span>`).join("");
+
+  updateForecast(done,goal,remaining,now);
+  updateInsights(now);
+  renderWeekBars(now);
+  renderMilestones(done,goal);
+  checkCelebrations(done,goal);
 }
+
+
+function updateInsights(now){
+  const completed=[...records].filter(r=>new Date(r.finish)<=now);
+  const totalCompleted=completed.reduce((a,r)=>a+netMs(r),0);
+  $("avgShift").textContent=completed.length?formatDur(totalCompleted/completed.length):"0h 00m";
+  $("longestShift").textContent=completed.length?formatDur(Math.max(...completed.map(netMs))):"0h 00m";
+
+  if(completed.length){
+    const first=new Date(Math.min(...completed.map(r=>new Date(r.start).getTime())));
+    const elapsedWeeks=Math.max((now-first)/(7*24*3600000),1);
+    $("avgWeek").textContent=formatDur(totalCompleted/elapsedWeeks);
+  }else $("avgWeek").textContent="0h 00m";
+
+  const keys=[...new Set(completed.map(r=>dayKey(new Date(r.start))))].sort();
+  let streak=keys.length?1:0;
+  for(let i=keys.length-1;i>0;i--){
+    const a=new Date(keys[i]+"T12:00:00"),b=new Date(keys[i-1]+"T12:00:00");
+    if(Math.round((a-b)/(24*3600000))===1) streak++; else break;
+  }
+  $("placementStreak").textContent=`${streak} ${streak===1?"day":"days"}`;
+}
+
+function renderWeekBars(now){
+  const weeks=[];
+  const current=startOfWeek(now);
+  for(let i=7;i>=0;i--){
+    const from=new Date(current);from.setDate(from.getDate()-i*7);
+    const to=new Date(from);to.setDate(to.getDate()+7);
+    const hours=sumSince(from,to)/3600000;
+    weeks.push({from,hours});
+  }
+  const max=Math.max(1,...weeks.map(w=>w.hours));
+  $("weekBars").innerHTML=weeks.map(w=>{
+    const h=Math.max(3,(w.hours/max)*120);
+    const label=w.from.toLocaleDateString([], {day:"numeric",month:"short"});
+    return `<div class="week-col"><div class="week-value">${w.hours.toFixed(1)}h</div><div class="week-bar-wrap"><div class="week-bar" style="height:${h}px"></div></div><div class="week-label">${label}</div></div>`;
+  }).join("");
+}
+
+function checkCelebrations(done,goal){
+  const milestones=[100,200,300,goal];
+  const reached=milestones.filter(v=>done>=v&&!celebrated.includes(v)).sort((a,b)=>a-b);
+  if(!reached.length)return;
+  const v=reached[0];
+  celebrated.push(v);localStorage.setItem(CELEBRATED,JSON.stringify(celebrated));
+  $("celebrateTitle").textContent=v===goal?"Placement goal reached!":"Milestone reached!";
+  $("celebrateText").textContent=v===goal?`You've completed ${goal} placement hours.`:`You've completed ${v} placement hours. Keep going.`;
+  $("celebrateModal").classList.add("open");
+}
+
+function updateForecast(done,goal,remaining,now){
+  const main=$("forecastMain"),sub=$("forecastSub");
+  if(remaining<=0){
+    main.textContent="Goal complete";
+    sub.textContent="You've reached your required placement hours.";
+    return;
+  }
+  if(!settings.placementDeadline){
+    main.textContent="Add a target date in Settings";
+    sub.textContent="We'll calculate the weekly pace needed to reach your goal.";
+    return;
+  }
+  const deadline=new Date(`${settings.placementDeadline}T23:59:59`);
+  const msLeft=deadline-now;
+  if(msLeft<=0){
+    main.textContent=`${remaining.toFixed(1)} hours still required`;
+    sub.textContent="Your target completion date has passed. Update it in Settings if needed.";
+    return;
+  }
+  const weeksLeft=Math.max(msLeft/(7*24*3600000),1/7);
+  const neededPerWeek=remaining/weeksLeft;
+
+  const completedSorted=[...records].filter(r=>new Date(r.finish)<=now).sort((a,b)=>new Date(a.start)-new Date(b.start));
+  if(completedSorted.length>=2){
+    const first=new Date(completedSorted[0].start);
+    const elapsedWeeks=Math.max((now-first)/(7*24*3600000),1);
+    const completedMs=completedSorted.reduce((a,r)=>a+netMs(r),0);
+    const pace=(completedMs/3600000)/elapsedWeeks;
+    if(pace>0){
+      const projectedWeeks=remaining/pace;
+      const projected=new Date(now.getTime()+projectedWeeks*7*24*3600000);
+      const projectedText=projected.toLocaleDateString([], {day:"numeric",month:"short",year:"numeric"});
+      if(projected<=deadline){
+        main.textContent=`On track — about ${pace.toFixed(1)} h/week`;
+        sub.textContent=`At your recent pace, projected completion is ${projectedText}. You need ${neededPerWeek.toFixed(1)} h/week by your target date.`;
+      }else{
+        main.textContent=`Aim for ${neededPerWeek.toFixed(1)} hours/week`;
+        sub.textContent=`Your recent pace is about ${pace.toFixed(1)} h/week. Increase it to meet your target date.`;
+      }
+      return;
+    }
+  }
+  main.textContent=`Aim for ${neededPerWeek.toFixed(1)} hours/week`;
+  sub.textContent=`You have ${weeksLeft.toFixed(1)} weeks and ${remaining.toFixed(1)} hours remaining. More history will improve the forecast.`;
+}
+
+function renderMilestones(done,goal){
+  const base=[100,200,300];
+  if(!base.includes(goal)) base.push(goal);
+  const unique=[...new Set(base.filter(x=>x<=goal))].sort((a,b)=>a-b);
+  const next=unique.find(v=>done<v);
+  $("milestones").innerHTML=unique.map(v=>{
+    const isDone=done>=v,isNext=!isDone&&v===next;
+    const badge=isDone?"Completed":isNext?"Next goal":"Upcoming";
+    return `<div class="milestone ${isDone?"done":isNext?"next":""}"><strong>${isDone?"✓ ":""}${v}h</strong><small>${v===goal?"Placement goal":"Milestone"}</small><span class="milestone-badge">${badge}</span></div>`;
+  }).join("");
+}
+
+function renderCalendar(){
+  const now=new Date(),y=now.getFullYear(),m=now.getMonth();
+  $("calendarTitle").textContent=now.toLocaleDateString([],{month:"long",year:"numeric"});
+  const counts={};
+  records.forEach(r=>{const d=new Date(r.start);if(d.getFullYear()===y&&d.getMonth()===m)counts[d.getDate()]=(counts[d.getDate()]||0)+netMs(r)});
+  const first=new Date(y,m,1),daysInMonth=new Date(y,m+1,0).getDate();
+  const headers=["M","T","W","T","F","S","S"];
+  let html=headers.map(x=>`<div class="cal-head">${x}</div>`).join("");
+  const offset=(first.getDay()+6)%7;
+  for(let i=0;i<offset;i++) html+=`<div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=d===now.getDate();
+    html+=`<div class="cal-day ${counts[d]?"has":""} ${isToday?"today":""}" title="${counts[d]?formatDur(counts[d]):"No shift"}">${d}</div>`;
+  }
+  $("calendar").innerHTML=html;
+}
+
 function render(){
-  $("startBtn").disabled=!!active;$("stopBtn").disabled=!active;
-  updateSummary();
-  renderHistory();
-  applyTheme();
+  $("startBtn").disabled=!!active;$("stopBtn").disabled=!active;$("mobileStart").disabled=!!active;$("mobileStop").disabled=!active;
+  updateSummary();renderHistory();renderCalendar();applyTheme();
 }
+
 function renderHistory(){
   const q=$("searchBox").value.trim().toLowerCase(),h=$("history");h.innerHTML="";
   const sorted=[...records].sort((a,b)=>new Date(b.start)-new Date(a.start));
   const filtered=sorted.filter(r=>{
     const s=new Date(r.start);
-    const text=[s.toLocaleDateString(),s.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"}),dayKey(s),time(s),time(new Date(r.finish))].join(" ").toLowerCase();
+    const text=[s.toLocaleDateString(),s.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"}),dayKey(s),time(s),time(new Date(r.finish)),r.notes||""].join(" ").toLowerCase();
     return !q||text.includes(q);
   });
   if(!filtered.length){h.innerHTML=`<div class="empty">${q?"No matching shifts.":"No completed shifts yet."}</div>`;return}
-  filtered.forEach(r=>{
-    const s=new Date(r.start),f=new Date(r.finish),row=document.createElement("div");row.className="record";
-    row.innerHTML=`<div><strong>${s.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})}</strong></div><div>${time(s)}</div><div>${time(f)}</div><div class="hours"><strong>${formatDur(netMs(r))}</strong>${r.breakMinutes?`<br><small style="color:var(--muted)">${r.breakMinutes}m break</small>`:""}</div><button type="button">Edit</button>`;
-    row.querySelector("button").addEventListener("click",()=>openShift(r));h.appendChild(row)
+  filtered.slice(0,20).forEach(r=>{
+    const s=new Date(r.start),f=new Date(r.finish),card=document.createElement("article");card.className="shift-card";
+    const breakText=r.breakMinutes?` • ${r.breakMinutes}m unpaid break`:"";
+    card.innerHTML=`<div class="shift-card-top">
+      <div>
+        <div class="shift-date">${s.toLocaleDateString([],{weekday:"long",day:"numeric",month:"short",year:"numeric"})}</div>
+        <div class="shift-times">${time(s)} → ${time(f)}${breakText}</div>
+      </div>
+      <div class="shift-hours">${formatDur(netMs(r))}</div>
+    </div>
+    ${r.notes?`<div class="shift-note">${escapeHtml(r.notes)}</div>`:""}
+    <div class="shift-actions"><button type="button">Edit shift</button></div>`;
+    card.querySelector("button").addEventListener("click",()=>openShift(r));h.appendChild(card);
   });
 }
-function applyTheme(){
-  document.documentElement.dataset.theme=settings.theme==="dark"?"dark":"light";
-  $("themeBtn").textContent=settings.theme==="dark"?"Light":"Dark";
-}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function applyTheme(){document.documentElement.dataset.theme=settings.theme==="dark"?"dark":"light";$("themeBtn").textContent=settings.theme==="dark"?"Light":"Dark"}
 
-$("startBtn").addEventListener("click",()=>{
-  if(active)return;active=new Date();localStorage.setItem(ACTIVE,active.toISOString());$("timer").textContent="00:00:00";persistLocal()
-});
-$("stopBtn").addEventListener("click",()=>{
+function startTracking(){
+  if(active)return;active=new Date();localStorage.setItem(ACTIVE,active.toISOString());$("timer").textContent="00:00:00";persistLocal();
+}
+function stopTracking(){
   if(!active)return;const f=new Date();
-  records.push({id:uid(),start:active.toISOString(),finish:f.toISOString(),breakMinutes:0,updatedAt:Date.now()});
-  active=null;localStorage.removeItem(ACTIVE);$("timer").textContent="00:00:00";$("status").textContent=`Stopped at ${time(f)}`;persistLocal()
-});
+  records.push({id:uid(),start:active.toISOString(),finish:f.toISOString(),breakMinutes:0,notes:"",updatedAt:Date.now()});
+  active=null;localStorage.removeItem(ACTIVE);$("timer").textContent="00:00:00";$("status").textContent="Shift completed";persistLocal();
+}
+$("startBtn").addEventListener("click",startTracking);$("mobileStart").addEventListener("click",startTracking);
+$("stopBtn").addEventListener("click",stopTracking);$("mobileStop").addEventListener("click",stopTracking);
 
 function openShift(r=null){
   editingId=r?.id||null;$("shiftTitle").textContent=r?"Edit shift":"Add previous shift";$("deleteShift").hidden=!r;
-  const d=r?new Date(r.start):new Date();$("shiftDate").value=dayKey(d);$("shiftStart").value=r?new Date(r.start).toTimeString().slice(0,5):"08:00";$("shiftFinish").value=r?new Date(r.finish).toTimeString().slice(0,5):"16:00";$("shiftBreak").value=r?.breakMinutes||0;$("shiftModal").classList.add("open")
+  const d=r?new Date(r.start):new Date();$("shiftDate").value=dayKey(d);$("shiftStart").value=r?new Date(r.start).toTimeString().slice(0,5):"08:00";$("shiftFinish").value=r?new Date(r.finish).toTimeString().slice(0,5):"16:00";$("shiftBreak").value=r?.breakMinutes||0;$("shiftNotes").value=r?.notes||"";$("shiftModal").classList.add("open");
 }
 $("addBtn").addEventListener("click",()=>openShift());
 $("cancelShift").addEventListener("click",()=>$("shiftModal").classList.remove("open"));
 $("saveShift").addEventListener("click",()=>{
-  const d=$("shiftDate").value,s=$("shiftStart").value,f=$("shiftFinish").value,b=Number($("shiftBreak").value)||0;
+  const d=$("shiftDate").value,s=$("shiftStart").value,f=$("shiftFinish").value,b=Number($("shiftBreak").value)||0,notes=$("shiftNotes").value.trim();
   if(!d||!s||!f)return alert("Enter the date, start time, and finish time.");
   const start=new Date(`${d}T${s}`),finish=new Date(`${d}T${f}`);if(finish<=start)finish.setDate(finish.getDate()+1);
-  const rec={id:editingId||uid(),start:start.toISOString(),finish:finish.toISOString(),breakMinutes:b,updatedAt:Date.now()};
-  records=editingId?records.map(x=>x.id===editingId?rec:x):[...records,rec];$("shiftModal").classList.remove("open");persistLocal()
+  const rec={id:editingId||uid(),start:start.toISOString(),finish:finish.toISOString(),breakMinutes:b,notes,updatedAt:Date.now()};
+  records=editingId?records.map(x=>x.id===editingId?rec:x):[...records,rec];$("shiftModal").classList.remove("open");persistLocal();
 });
-$("deleteShift").addEventListener("click",()=>{
-  if(editingId&&confirm("Delete this shift?")){records=records.filter(r=>r.id!==editingId);$("shiftModal").classList.remove("open");persistLocal()}
-});
-$("clearBtn").addEventListener("click",()=>{
-  if(active)return alert("Stop the current timer first.");
-  if(confirm("Delete every saved shift? This also updates the cloud copy when signed in.")){records=[];persistLocal()}
-});
+$("deleteShift").addEventListener("click",()=>{if(editingId&&confirm("Delete this shift?")){records=records.filter(r=>r.id!==editingId);$("shiftModal").classList.remove("open");persistLocal()}});
+$("clearBtn").addEventListener("click",()=>{if(active)return alert("Finish the current shift first.");if(confirm("Delete every saved shift? This also updates the cloud copy when signed in.")){records=[];persistLocal()}});
 $("searchBox").addEventListener("input",renderHistory);
 
 function download(name,data,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 $("csvBtn").addEventListener("click",()=>{
-  const rows=[["Date","Start","Finish","Break minutes","Net hours"],...records.sort((a,b)=>new Date(a.start)-new Date(b.start)).map(r=>{const s=new Date(r.start),f=new Date(r.finish);return [dayKey(s),time(s),time(f),r.breakMinutes||0,(netMs(r)/3600000).toFixed(2)]})];
-  download("placement-hours.csv",rows.map(row=>row.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n"),"text/csv")
+  const rows=[["Date","Start","Finish","Break minutes","Net hours","Notes"],...[...records].sort((a,b)=>new Date(a.start)-new Date(b.start)).map(r=>{const s=new Date(r.start),f=new Date(r.finish);return [dayKey(s),time(s),time(f),r.breakMinutes||0,(netMs(r)/3600000).toFixed(2),r.notes||""]})];
+  download("placement-hours.csv",rows.map(row=>row.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n"),"text/csv");
 });
 $("pdfBtn").addEventListener("click",()=>window.print());
 
+
+function buildProfessionalReport(){
+  const sorted=[...records].sort((a,b)=>new Date(a.start)-new Date(b.start));
+  const completedMs=sorted.reduce((a,r)=>a+netMs(r),0);
+  const totalHours=(completedMs/3600000).toFixed(2);
+  const first=sorted.length?new Date(sorted[0].start):null;
+  const last=sorted.length?new Date(sorted[sorted.length-1].finish):null;
+  const days=new Set(sorted.map(r=>dayKey(new Date(r.start)))).size;
+  const avg=sorted.length?formatDur(completedMs/sorted.length):"0h 00m";
+  const longest=sorted.length?formatDur(Math.max(...sorted.map(netMs))):"0h 00m";
+  const goal=Number(settings.goalHours)||460;
+  const rows=sorted.map(r=>{
+    const s=new Date(r.start),f=new Date(r.finish);
+    return `<tr><td>${s.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})}</td><td>${time(s)}</td><td>${time(f)}</td><td>${r.breakMinutes||0}m</td><td>${formatDur(netMs(r))}</td><td>${escapeHtml(r.notes||"")}</td></tr>`;
+  }).join("");
+  const period=first?`${first.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})} – ${last.toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"})}`:"No shifts recorded";
+  $("reportPaper").innerHTML=`
+    <div class="report-head">
+      <div class="report-brand"><img src="icon-192.png" alt=""><div><div class="report-title">Placement Hours Report</div><div class="report-sub">Generated ${new Date().toLocaleDateString([],{day:"numeric",month:"long",year:"numeric"})}</div></div></div>
+      <div class="report-sub">Placement Hours · Built by Munashe</div>
+    </div>
+    <div class="report-section"><h3>Placement details</h3>
+      <div class="report-grid">
+        <div class="report-stat"><span>Placement</span><strong>${escapeHtml(settings.placementName||"—")}</strong></div>
+        <div class="report-stat"><span>Programme / qualification</span><strong>${escapeHtml(settings.qualification||"—")}</strong></div>
+        <div class="report-stat"><span>Organisation</span><strong>${escapeHtml(settings.organisation||"—")}</strong></div>
+        <div class="report-stat"><span>Supervisor</span><strong>${escapeHtml(settings.supervisor||"—")}</strong></div>
+        <div class="report-stat"><span>Placement period</span><strong>${period}</strong></div>
+        <div class="report-stat"><span>Required hours</span><strong>${goal}h</strong></div>
+      </div>
+    </div>
+    <div class="report-section"><h3>Attendance summary</h3>
+      <div class="report-grid">
+        <div class="report-stat"><span>Total completed</span><strong>${totalHours}h</strong></div>
+        <div class="report-stat"><span>Placement days</span><strong>${days}</strong></div>
+        <div class="report-stat"><span>Average shift</span><strong>${avg}</strong></div>
+        <div class="report-stat"><span>Longest shift</span><strong>${longest}</strong></div>
+        <div class="report-stat"><span>Progress</span><strong>${goal?Math.min(100,(Number(totalHours)/goal)*100).toFixed(1):0}%</strong></div>
+        <div class="report-stat"><span>Hours remaining</span><strong>${Math.max(0,goal-Number(totalHours)).toFixed(2)}h</strong></div>
+      </div>
+    </div>
+    ${settings.professionalSummary?`<div class="report-section"><h3>Skills, competencies and reflection summary</h3><p>${escapeHtml(settings.professionalSummary).replace(/\n/g,"<br>")}</p></div>`:""}
+    <div class="report-section"><h3>Shift record</h3>
+      ${rows?`<table class="report-table"><thead><tr><th>Date</th><th>Start</th><th>Finish</th><th>Break</th><th>Net</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`:"<p>No completed shifts recorded.</p>"}
+    </div>
+    <div class="signature-grid"><div class="signature-line">Student signature / date</div><div class="signature-line">Supervisor signature / date</div></div>
+  `;
+}
+$("reportBtn").addEventListener("click",()=>{buildProfessionalReport();$("reportModal").classList.add("open")});
+$("closeReport").addEventListener("click",()=>$("reportModal").classList.remove("open"));
+$("printReport").addEventListener("click",()=>{document.body.classList.add("print-report");window.print();setTimeout(()=>document.body.classList.remove("print-report"),300)});
+$("closeCelebrate").addEventListener("click",()=>$("celebrateModal").classList.remove("open"));
+
 $("backupBtn").addEventListener("click",()=>$("backupModal").classList.add("open"));
 $("closeBackup").addEventListener("click",()=>$("backupModal").classList.remove("open"));
-$("downloadBackup").addEventListener("click",()=>download("placement-hours-backup.json",JSON.stringify({version:3,records,settings,exportedAt:new Date().toISOString()},null,2),"application/json"));
+$("downloadBackup").addEventListener("click",()=>download("placement-hours-backup.json",JSON.stringify({version:4,records,settings,exportedAt:new Date().toISOString()},null,2),"application/json"));
 $("restoreBackup").addEventListener("click",()=>$("restoreFile").click());
 $("restoreFile").addEventListener("change",async e=>{
   try{const x=JSON.parse(await e.target.files[0].text());if(!Array.isArray(x.records))throw 0;records=x.records;settings={...settings,...(x.settings||{})};persistLocal();alert("Backup restored.")}catch{alert("That backup file could not be read.")}
@@ -307,10 +728,10 @@ $("restoreFile").addEventListener("change",async e=>{
 
 $("settingsBtn").addEventListener("click",()=>{loadSettings();$("settingsModal").classList.add("open")});
 function loadSettings(){
-  $("goalHours").value=settings.goalHours||"";$("placementName").value=settings.placementName||"";renderUserArea()
+  $("goalHours").value=settings.goalHours||"460";$("placementName").value=settings.placementName||"";$("qualification").value=settings.qualification||"";$("organisation").value=settings.organisation||"";$("supervisor").value=settings.supervisor||"";$("placementStart").value=settings.placementStart||"";$("placementDeadline").value=settings.placementDeadline||"";$("professionalSummary").value=settings.professionalSummary||"";renderUserArea();
 }
 $("closeSettings").addEventListener("click",()=>{
-  settings.goalHours=$("goalHours").value;settings.placementName=$("placementName").value.trim();$("settingsModal").classList.remove("open");persistLocal()
+  settings.goalHours=$("goalHours").value||"460";settings.placementName=$("placementName").value.trim();settings.qualification=$("qualification").value.trim();settings.organisation=$("organisation").value.trim();settings.supervisor=$("supervisor").value.trim();settings.placementStart=$("placementStart").value;settings.placementDeadline=$("placementDeadline").value;settings.professionalSummary=$("professionalSummary").value.trim();$("settingsModal").classList.remove("open");persistLocal();
 });
 $("themeBtn").addEventListener("click",()=>{settings.theme=settings.theme==="dark"?"light":"dark";persistLocal()});
 
@@ -321,10 +742,10 @@ function setSyncState(state,title,sub){
 function renderUserArea(){
   const area=$("userArea");area.innerHTML="";
   if(currentUser){
-    const d=document.createElement("div");d.className="signed-user";d.innerHTML=`${currentUser.photoURL?`<img class="avatar" src="${currentUser.photoURL}" alt="">`:`<div class="avatar"></div>`}<div><strong>${currentUser.displayName||"Signed in"}</strong><div class="note">${currentUser.email||""}</div></div>`;
-    area.appendChild(d)
+    const d=document.createElement("div");d.className="signed-user";d.innerHTML=`${currentUser.photoURL?`<img class="avatar" src="${currentUser.photoURL}" alt="">`:`<div class="avatar"></div>`}<div><strong>${currentUser.displayName||"Signed in"}</strong><div class="note">${currentUser.email||""}</div></div>`;area.appendChild(d);
   }
 }
+
 async function initFirebase(){
   try{
     const appMod=await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js");
@@ -333,9 +754,7 @@ async function initFirebase(){
     const app=appMod.initializeApp(firebaseConfig),auth=authMod.getAuth(app),db=fsMod.getFirestore(app);
     firebase={auth,db,...authMod,...fsMod};
     authMod.onAuthStateChanged(auth,async user=>{
-      currentUser=user||null;
-      $("authBtn").textContent=currentUser?"Sign out":"Sign in with Google";
-      renderUserArea();
+      currentUser=user||null;$("authBtn").textContent=currentUser?"Sign out":"Sign in with Google";renderUserArea();
       if(currentUser){
         setSyncState("","Signed in","Checking cloud data…");
         try{await reconcileCloud();setSyncState("ok","Cloud sync on",currentUser.email||"Signed in")}catch(e){console.error(e);setSyncState("bad","Sync problem","Your local data is still safe on this device.")}
@@ -343,30 +762,19 @@ async function initFirebase(){
     });
   }catch(e){console.error(e);setSyncState("bad","Firebase could not load","Check your internet connection.")}
 }
+
 $("authBtn").addEventListener("click",async()=>{
   if(!firebase)return alert("Firebase is still loading. Try again in a moment.");
   if(currentUser){await firebase.signOut(firebase.auth);return}
-
-  const provider=new firebase.GoogleAuthProvider();
-  provider.setCustomParameters({prompt:"select_account"});
-
-  try{
-    await firebase.signInWithPopup(firebase.auth,provider);
-  }catch(e){
-    console.error("Google sign-in error:",e);
-    const code=e?.code||"unknown";
-    const message=e?.message||"Unknown error";
-    if(code==="auth/popup-blocked"){
-      alert("Your browser blocked the Google sign-in popup. Please allow popups for this site, then try again.");
-    }else if(code==="auth/popup-closed-by-user"){
-      // User simply closed the chooser; no alert needed.
-    }else if(code==="auth/unauthorized-domain"){
-      alert("Firebase is rejecting this website domain. Check Authentication → Settings → Authorized domains and make sure munya042.github.io is listed.");
-    }else{
-      alert(`Google sign-in failed.\n\nError: ${code}\n\n${message}`);
-    }
+  const provider=new firebase.GoogleAuthProvider();provider.setCustomParameters({prompt:"select_account"});
+  try{await firebase.signInWithPopup(firebase.auth,provider)}catch(e){
+    console.error("Google sign-in error:",e);const code=e?.code||"unknown",message=e?.message||"Unknown error";
+    if(code==="auth/popup-blocked") alert("Your browser blocked the Google sign-in popup. Allow popups for this site, then try again.");
+    else if(code==="auth/popup-closed-by-user") {}
+    else alert(`Google sign-in failed.\n\nError: ${code}\n\n${message}`);
   }
 });
+
 async function reconcileCloud(){
   if(!firebase||!currentUser)return;
   const ref=firebase.doc(firebase.db,"users",currentUser.uid),snap=await firebase.getDoc(ref);
@@ -375,18 +783,16 @@ async function reconcileCloud(){
   if(remoteUpdated>localUpdated){
     records=Array.isArray(remote.records)?remote.records:[];
     settings={...settings,...(remote.settings||{})};
+    if(!settings.goalHours) settings.goalHours="460";
     meta.localUpdatedAt=remoteUpdated;
-    localStorage.setItem(STORAGE,JSON.stringify(records));localStorage.setItem(SETTINGS,JSON.stringify(settings));localStorage.setItem(META,JSON.stringify(meta));
-    render();
-  }else if(localUpdated>remoteUpdated){await uploadCloud()}
+    localStorage.setItem(STORAGE,JSON.stringify(records));localStorage.setItem(SETTINGS,JSON.stringify(settings));localStorage.setItem(META,JSON.stringify(meta));render();
+  }else if(localUpdated>remoteUpdated) await uploadCloud();
 }
-function queueSync(){
-  clearTimeout(syncTimer);syncTimer=setTimeout(()=>uploadCloud().catch(e=>{console.error(e);setSyncState("bad","Waiting to sync","Changes are saved locally.")}),600)
-}
+function queueSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>uploadCloud().catch(e=>{console.error(e);setSyncState("bad","Waiting to sync","Changes are saved locally.")}),600)}
 async function uploadCloud(){
   if(!firebase||!currentUser||!navigator.onLine)return;
   const ref=firebase.doc(firebase.db,"users",currentUser.uid),updatedAt=Number(meta.localUpdatedAt)||Date.now();
-  await firebase.setDoc(ref,{records,settings:{goalHours:settings.goalHours||"",placementName:settings.placementName||""},updatedAt},{merge:false});
+  await firebase.setDoc(ref,{records,settings,updatedAt},{merge:false});
   setSyncState("ok","Cloud sync on",currentUser.email||"Synced");
 }
 window.addEventListener("online",()=>{if(currentUser){setSyncState("","Back online","Syncing…");reconcileCloud().then(()=>setSyncState("ok","Cloud sync on",currentUser.email||"Synced")).catch(()=>{})}});

@@ -1,34 +1,52 @@
-PLACEMENT HOURS TRACKER — VERSION 2.1
+PLACEMENT HOURS — VERSION 4.0
 
-Included:
-- Google sign-in
-- Firebase/Firestore cloud sync
+V3.0 includes:
+- Minimalist redesigned dashboard
+- 460-hour default placement target
+- Progress percentage and hours remaining
+- Play/Start and Finish buttons
+- This week / this month / total / placement days
+- Milestones
+- Monthly placement calendar
+- Shift notes
+- Placement details: organisation, supervisor, start date, completion target date
+- Google Sign-In
+- Firebase / Firestore cloud sync
 - Offline local storage
-- Start/Stop timer
-- Manual previous-shift entry
+- Manual shift entry
 - Edit/delete shifts
 - Break deductions
-- Total, weekly, monthly, average and longest-day stats
-- Placement target progress
-- Search
 - CSV export
-- Print/PDF export
+- Print/PDF
 - JSON backup/restore
 - Dark mode
-- Installable PWA
+- About and Privacy Policy pages
+- PWA install support
 
-FIREBASE
-Project configuration is already built into index.html.
-Authentication must have Google enabled.
-Authorized domains must include: munya042.github.io
-Firestore rules should match firestore.rules in this package.
+DATA SAFETY
+V3.0 migrates local data from the previous v3 storage keys automatically.
+Cloud data remains in the same Firebase user document.
 
-GITHUB
-Replace the existing repository files with the files in this package and commit to main.
-GitHub Pages should remain configured to deploy from main / (root).
+DEPLOYMENT
+Test locally first. When satisfied, upload these files to the existing GitHub repository and commit to main.
 
-V2.1 FIX:
-- Removed redirect fallback for Google sign-in on GitHub Pages.
-- Uses popup sign-in only.
-- Shows the exact Firebase error code if sign-in fails.
-- Bumped service worker cache so the update loads immediately.
+V3.1 POLISH
+- Stronger goal/progress presentation
+- Larger timer and refined Start/Finish controls
+- Programme/qualification and organisation shown in the header
+- Smarter milestones: Completed / Next goal / Upcoming
+- Mobile-friendly Recent Shift cards
+- Completion forecast using target date
+- Weekly pace needed to meet target
+- Pace-based projected completion once enough history exists
+
+V4.0 RELEASE CANDIDATE
+- New custom minimalist clock/check app icon
+- Built by Munashe branding
+- Average shift, weekly average, longest shift and placement streak
+- Eight-week hours chart
+- Milestone celebration overlay
+- Professional placement report with placement details, attendance summary, notes and signature lines
+- Optional skills / competencies / reflection summary in Settings
+- Mobile sticky Start / Finish controls
+- Existing V3.1 functionality retained

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#166534">
+
+  <title>About | Placement Hours</title>
+
+  <style>
+    :root {
+      --bg: #f3f6f4;
+      --card: #ffffff;
+      --text: #17201c;
+      --muted: #66736b;
+      --border: #d8e0db;
+      --green: #15803d;
+      --green-dark: #166534;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(850px, calc(100% - 28px));
+      margin: 30px auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .back {
+      display: inline-block;
+      text-decoration: none;
+      color: var(--green-dark);
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--card);
+      padding: 9px 13px;
+      border-radius: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    ul {
+      margin-bottom: 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    .goal {
+      border-left: 4px solid var(--green);
+    }
+
+    .goal strong {
+      color: var(--green-dark);
+      font-size: 1.12rem;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .detail {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 13px;
+    }
+
+    .detail span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      padding: 10px 0 25px;
+    }
+
+    @media (max-width: 650px) {
+      main {
+        margin-top: 16px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .details {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<main>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="icon-192.png" alt="Placement Hours icon">
+      <div>
+        <h1>About Placement Hours</h1>
+        <p>A simple way to track placement time.</p>
+      </div>
+    </div>
+
+    <a class="back" href="index.html">← Back</a>
+  </header>
+
+  <section class="card">
+    <h2>What is Placement Hours?</h2>
+
+    <p>
+      Placement Hours is a simple time-tracking application designed to help
+      students record, manage and review the hours they complete during
+      placements, internships, practicums and professional experience.
+    </p>
+
+    <p>
+      Instead of relying on paper notes or manually calculating hours,
+      the app lets you start and finish a shift, automatically calculates
+      the time completed and keeps a history of your placement activity.
+    </p>
+  </section>
+
+  <section class="card goal">
+    <h2>Placement Goal</h2>
+
+    <p>
+      The tracker includes progress monitoring so users can see how many
+      placement hours they have completed and how many remain.
+    </p>
+
+    <p>
+      <strong>Current target: 460 placement hours.</strong>
+    </p>
+
+    <p>
+      The required-hours target can be changed in Settings so the app can
+      also be used by students with different placement requirements.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Key Features</h2>
+
+    <ul>
+      <li>Start and finish shift timer</li>
+      <li>Automatic calculation of placement hours</li>
+      <li>Add previous or missed shifts manually</li>
+      <li>Edit and delete recorded shifts</li>
+      <li>Record unpaid break time</li>
+      <li>Weekly, monthly and total-hour summaries</li>
+      <li>Progress tracking toward required placement hours</li>
+      <li>Google Sign-In</li>
+      <li>Private cloud synchronisation using Firebase Firestore</li>
+      <li>Local offline storage</li>
+      <li>CSV export</li>
+      <li>Printable / PDF placement records</li>
+      <li>Backup and restore</li>
+      <li>Light and dark appearance options</li>
+      <li>Completion forecast and weekly pace guidance</li>
+      <li>Placement insights and eight-week activity chart</li>
+      <li>Milestone celebrations</li>
+      <li>Professional placement report for PDF or printing</li>
+      <li>Mobile quick Start / Finish controls</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Privacy and Ownership</h2>
+
+    <p>
+      Each signed-in user has their own placement record. Placement data
+      is stored under the user's Firebase account identifier and access is
+      controlled using Firebase Authentication and Firestore Security Rules.
+    </p>
+
+    <p>
+      More information is available on the
+      <a href="privacy.html">Privacy Policy</a> page.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Who is it for?</h2>
+
+    <p>
+      Placement Hours is intended for students and trainees who need a
+      straightforward way to document hours completed as part of practical
+      learning, workplace experience or professional placement requirements.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>App Details</h2>
+
+    <div class="details">
+      <div class="detail">
+        <span>Application</span>
+        <strong>Placement Hours</strong>
+      </div>
+
+      <div class="detail">
+        <span>Developer</span>
+        <strong>Munashe</strong>
+      </div>
+
+      <div class="detail">
+        <span>Updated</span>
+        <strong>August 2026</strong>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Placement Hours Tracker · Built by Munashe
+  </footer>
+
+</main>
+
+</body>
+</html>
