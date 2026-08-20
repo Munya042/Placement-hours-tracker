@@ -164,15 +164,20 @@ button:disabled{opacity:.35;cursor:not-allowed}
 }
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  @page{margin:13mm}
+  @page{size:A4;margin:14mm}
+  html,body{width:auto!important;margin:0!important;padding:0!important;overflow:visible!important}
+  body.print-report *{box-sizing:border-box}
+  body.print-report #reportModal .sheet{border-radius:0!important}
   body.print-report main,body.print-report .modal:not(#reportModal),body.print-report .celebrate{display:none!important}
   body.print-report #reportModal{display:block!important;position:static;background:white}
   body.print-report #reportModal .sheet{max-height:none;width:100%;max-width:100%;padding:0;background:white;overflow:visible!important}
   body.print-report #reportModal{overflow:visible!important}
-  body.print-report .report-paper{overflow:visible!important;max-width:100%}
+  body.print-report .report-paper{overflow:visible!important;width:100%;max-width:100%;padding:0 3mm!important;box-sizing:border-box}
   body.print-report .report-head{gap:10px;flex-wrap:nowrap}
   body.print-report .report-head>.report-sub{flex:0 0 auto;text-align:right;white-space:nowrap;font-size:.78rem}
-  body.print-report .report-brand{min-width:0}
+  body.print-report .report-brand{min-width:0;flex:1 1 auto}
+  body.print-report .report-brand img{width:42px;height:42px;flex:0 0 auto}
+  body.print-report .report-title{font-size:1.35rem;line-height:1.15}
   body.print-report #reportModal .modal-actions{display:none!important}
   body.print-report .report-paper{border:0;border-radius:0;padding:0}
   body.print-report .report-head{border-bottom:3px solid #0f766e!important;padding-bottom:12px}
@@ -742,7 +747,7 @@ function buildProfessionalReport(){
   $("reportPaper").innerHTML=`
     <div class="report-head">
       <div class="report-brand"><img src="icon-192.png" alt=""><div><div class="report-title">Placement Hours Report</div><div class="report-sub">Generated ${new Date().toLocaleDateString([],{day:"numeric",month:"long",year:"numeric"})}</div></div></div>
-      <div class="report-sub">Placement Hours · Built by Nash</div>
+      <div class="report-sub">Built by Nash</div>
     </div>
     <div class="report-section"><h3>Placement details</h3>
       <div class="report-grid">
