@@ -165,11 +165,25 @@ button:disabled{opacity:.35;cursor:not-allowed}
   .signature-grid{grid-template-columns:1fr;gap:28px}
 }
 @media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  @page{margin:13mm}
   body.print-report main,body.print-report .modal:not(#reportModal),body.print-report .celebrate{display:none!important}
   body.print-report #reportModal{display:block!important;position:static;background:white}
   body.print-report #reportModal .sheet{max-height:none;width:100%;padding:0;background:white}
   body.print-report #reportModal .modal-actions{display:none!important}
   body.print-report .report-paper{border:0;border-radius:0;padding:0}
+  body.print-report .report-head{border-bottom:3px solid #0f766e!important;padding-bottom:12px}
+  body.print-report .report-title{color:#0f766e!important}
+  body.print-report .report-brand img{display:block!important}
+  body.print-report .report-section h3{color:#0f766e!important;border-bottom:1px solid #0f766e!important}
+  body.print-report .report-stat{border:1px solid #0f766e!important;background:#f0fdfa!important}
+  body.print-report .report-stat span{color:#0f766e!important}
+  body.print-report .report-table thead th{background:#0f766e!important;color:#ffffff!important;border-bottom:0!important}
+  body.print-report .report-table tbody tr:nth-child(even) td{background:#f0fdfa!important}
+  body.print-report .report-table{page-break-inside:auto}
+  body.print-report .report-table thead{display:table-header-group}
+  body.print-report .report-table tr{page-break-inside:avoid}
+  body.print-report .report-section{page-break-inside:avoid}
 }
 
 
@@ -190,7 +204,7 @@ button:disabled{opacity:.35;cursor:not-allowed}
       <div>
         <h1>Placement Hours <span class="version">v4.1</span></h1>
         <small id="placementNameLabel">Personal placement tracker</small>
-        <div id="brandMeta" class="brand-meta"></div><small class="built-by">Built by Munashe</small>
+        <div id="brandMeta" class="brand-meta"></div><small class="built-by">Built by Nash</small>
       </div>
     </div>
     <div class="top-actions">
@@ -725,7 +739,7 @@ function buildProfessionalReport(){
   $("reportPaper").innerHTML=`
     <div class="report-head">
       <div class="report-brand"><img src="icon-192.png" alt=""><div><div class="report-title">Placement Hours Report</div><div class="report-sub">Generated ${new Date().toLocaleDateString([],{day:"numeric",month:"long",year:"numeric"})}</div></div></div>
-      <div class="report-sub">Placement Hours · Built by Munashe</div>
+      <div class="report-sub">Placement Hours · Built by Nash</div>
     </div>
     <div class="report-section"><h3>Placement details</h3>
       <div class="report-grid">
