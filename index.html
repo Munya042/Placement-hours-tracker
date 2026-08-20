@@ -167,7 +167,12 @@ button:disabled{opacity:.35;cursor:not-allowed}
   @page{margin:13mm}
   body.print-report main,body.print-report .modal:not(#reportModal),body.print-report .celebrate{display:none!important}
   body.print-report #reportModal{display:block!important;position:static;background:white}
-  body.print-report #reportModal .sheet{max-height:none;width:100%;padding:0;background:white}
+  body.print-report #reportModal .sheet{max-height:none;width:100%;max-width:100%;padding:0;background:white;overflow:visible!important}
+  body.print-report #reportModal{overflow:visible!important}
+  body.print-report .report-paper{overflow:visible!important;max-width:100%}
+  body.print-report .report-head{gap:10px;flex-wrap:nowrap}
+  body.print-report .report-head>.report-sub{flex:0 0 auto;text-align:right;white-space:nowrap;font-size:.78rem}
+  body.print-report .report-brand{min-width:0}
   body.print-report #reportModal .modal-actions{display:none!important}
   body.print-report .report-paper{border:0;border-radius:0;padding:0}
   body.print-report .report-head{border-bottom:3px solid #0f766e!important;padding-bottom:12px}
