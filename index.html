@@ -195,6 +195,30 @@ button:disabled{opacity:.35;cursor:not-allowed}
 }
 
 
+.input-wrap select{width:100%;border:0;outline:0;background:transparent;color:var(--text)}
+.sup-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.sup-metric{background:var(--panel-2);border:1px solid var(--border);border-radius:14px;padding:11px 12px}
+.sup-metric .label{font-size:.74rem;color:var(--muted)}
+.sup-metric .value{font-size:1.12rem;font-weight:900;margin-top:3px}
+.sup-list{display:grid;gap:10px;margin-top:12px}
+.sup-card{background:var(--panel-2);border:1px solid var(--border);border-radius:16px;padding:14px}
+.sup-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sup-date{font-weight:850}
+.sup-meta{color:var(--muted);font-size:.82rem;margin-top:2px}
+.sup-dur{font-weight:900;white-space:nowrap}
+.sup-block{margin-top:10px;font-size:.87rem;line-height:1.45}
+.sup-block b{display:block;font-size:.71rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:850;margin-bottom:2px}
+.sup-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.sup-tag{font-size:.7rem;font-weight:850;color:var(--muted);background:var(--panel);border:1px solid var(--border);padding:3px 9px;border-radius:999px}
+.sup-tag.signed{color:var(--green);border-color:color-mix(in srgb,var(--green) 45%,var(--border))}
+.sup-actions{margin-top:8px}
+.sup-actions button{border:0;background:transparent;color:var(--blue);font-weight:800;padding:6px 0}
+.check-field{display:flex;align-items:center;gap:10px;grid-column:1/-1;padding:4px 0}
+.check-field span{margin:0!important;color:var(--text)!important;font-size:.92rem!important}
+.check-field input{width:20px;height:20px;accent-color:var(--accent)}
+@media(max-width:760px){.sup-metrics{grid-template-columns:repeat(2,1fr)}}
+@media print{.sup-actions{display:none!important}}
+
 .shift-reminder{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:70;padding:20px}
 .shift-reminder.open{display:flex}
 .shift-reminder-card{width:min(430px,100%);background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.22)}
@@ -210,7 +234,7 @@ button:disabled{opacity:.35;cursor:not-allowed}
     <div class="brand">
       <img src="icon-192.png" alt="">
       <div>
-        <h1>Placement Hours <span class="version">v4.1</span></h1>
+        <h1>Placement Hours <span class="version">v4.2</span></h1>
         <small id="placementNameLabel">Personal placement tracker</small>
         <div id="brandMeta" class="brand-meta"></div><small class="built-by">Built by Nash</small>
       </div>
@@ -312,6 +336,21 @@ button:disabled{opacity:.35;cursor:not-allowed}
     <div id="history" class="shift-list"></div>
   </section>
 
+  <section class="card section" style="margin-top:12px">
+    <div class="section-head">
+      <h2>Supervision log</h2>
+      <input id="supSearch" class="search" type="search" placeholder="Search supervisor, topics or actions">
+      <button id="addSupBtn" class="small-btn" type="button">＋ Add session</button>
+    </div>
+    <div class="sup-metrics">
+      <div class="sup-metric"><div class="label">Sessions logged</div><div id="supCount" class="value">0</div></div>
+      <div class="sup-metric"><div class="label">Supervision hours</div><div id="supHours" class="value">0h 00m</div></div>
+      <div class="sup-metric"><div class="label">Last session</div><div id="supLast" class="value">—</div></div>
+      <div class="sup-metric"><div class="label">Signed off</div><div id="supSigned" class="value">0</div></div>
+    </div>
+    <div id="supList" class="sup-list"></div>
+  </section>
+
   <p class="notice">Your device keeps an offline copy. When signed in, your latest saved version is also stored in your private Firebase record.</p>
 </main>
 
@@ -329,6 +368,33 @@ button:disabled{opacity:.35;cursor:not-allowed}
       <button id="cancelShift" class="small-btn" type="button">Cancel</button>
       <button id="deleteShift" class="danger" type="button" hidden>Delete</button>
       <button id="saveShift" class="primary" type="button">Save shift</button>
+    </div>
+  </div>
+</div>
+
+<div id="supModal" class="modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <h2 id="supModalTitle">Add supervision session</h2>
+    <div class="form-grid">
+      <label class="field"><span>Date</span><div class="input-wrap"><input id="supDate" type="date"></div></label>
+      <label class="field"><span>Start time (optional)</span><div class="input-wrap"><input id="supTime" type="time"></div></label>
+      <label class="field"><span>Duration (minutes)</span><div class="input-wrap"><input id="supMins" type="number" min="0" step="5" value="60"></div></label>
+      <label class="field"><span>Supervisor</span><div class="input-wrap"><input id="supName" placeholder="Supervisor name"></div></label>
+      <label class="field"><span>Type</span><div class="input-wrap"><select id="supType">
+        <option>Individual</option><option>Group</option><option>Peer</option><option>Cultural supervision</option><option>External</option><option>Informal</option>
+      </select></div></label>
+      <label class="field"><span>Format</span><div class="input-wrap"><select id="supFormat">
+        <option>In person</option><option>Online</option><option>Phone</option>
+      </select></div></label>
+      <label class="field" style="grid-column:1/-1"><span>Topics discussed</span><div class="input-wrap"><textarea id="supTopics" rows="3" placeholder="Example: caseload review, client concerns, safety planning..."></textarea></div></label>
+      <label class="field" style="grid-column:1/-1"><span>Reflection and learning</span><div class="input-wrap"><textarea id="supReflection" rows="3" placeholder="What you took from the session, what you would do differently..."></textarea></div></label>
+      <label class="field" style="grid-column:1/-1"><span>Actions agreed</span><div class="input-wrap"><textarea id="supActions" rows="2" placeholder="Follow-up tasks and who is doing them."></textarea></div></label>
+      <label class="field check-field"><input id="supSignedOff" type="checkbox"><span>Signed off by supervisor</span></label>
+    </div>
+    <div class="modal-actions">
+      <button id="cancelSup" class="small-btn" type="button">Cancel</button>
+      <button id="deleteSup" class="danger" type="button" hidden>Delete</button>
+      <button id="saveSup" class="primary" type="button">Save session</button>
     </div>
   </div>
 </div>
@@ -423,6 +489,7 @@ const STORAGE="placementTracker.records.v4";
 const ACTIVE="placementTracker.active.v4";
 const SETTINGS="placementTracker.settings.v4";
 const META="placementTracker.meta.v4";
+const SUPERVISIONS="placementTracker.supervisions.v4";
 const OLD_STORAGE="placementTracker.records.v3";
 const OLD_ACTIVE="placementTracker.active.v3";
 const OLD_SETTINGS="placementTracker.settings.v3";
@@ -440,11 +507,12 @@ function migrate(){
 migrate();
 
 let records=read(STORAGE,[]);
+let supervisions=read(SUPERVISIONS,[]);
 let active=localStorage.getItem(ACTIVE)?new Date(localStorage.getItem(ACTIVE)):null;
 let settings={goalHours:"460",placementName:"",qualification:"",organisation:"",supervisor:"",placementStart:"",placementDeadline:"",professionalSummary:"",theme:"light",...read(SETTINGS,{})};
 if(!settings.goalHours) settings.goalHours="460";
 let meta=read(META,{localUpdatedAt:0});
-let editingId=null, firebase=null, currentUser=null, syncTimer=null;
+let editingId=null, editingSupId=null, firebase=null, currentUser=null, syncTimer=null;
 const CELEBRATED="placementTracker.celebrated.v4";
 const SHIFT_REMINDER="placementTracker.shiftReminder.v4.1";
 let celebrated=read(CELEBRATED,[]);
@@ -452,6 +520,7 @@ let reminderShownFor=null;
 
 function persistLocal(touch=true){
   localStorage.setItem(STORAGE,JSON.stringify(records));
+  localStorage.setItem(SUPERVISIONS,JSON.stringify(supervisions));
   localStorage.setItem(SETTINGS,JSON.stringify(settings));
   if(touch){meta.localUpdatedAt=Date.now();localStorage.setItem(META,JSON.stringify(meta))}
   render();
@@ -653,7 +722,7 @@ function renderCalendar(){
 
 function render(){
   $("startBtn").disabled=!!active;$("stopBtn").disabled=!active;
-  updateSummary();renderHistory();renderCalendar();applyTheme();
+  updateSummary();renderHistory();renderSupervision();renderCalendar();applyTheme();
 }
 
 function renderHistory(){
@@ -721,6 +790,93 @@ $("deleteShift").addEventListener("click",()=>{if(editingId&&confirm("Delete thi
 $("clearBtn").addEventListener("click",()=>{if(active)return alert("Finish the current shift first.");if(confirm("Delete every saved shift? This also updates the cloud copy when signed in.")){records=[];persistLocal()}});
 $("searchBox").addEventListener("input",renderHistory);
 
+function supMinutes(s){return Math.max(0,Number(s.minutes)||0)}
+function supDateLabel(d){return d?new Date(d+"T00:00").toLocaleDateString([],{weekday:"long",day:"numeric",month:"short",year:"numeric"}):"—"}
+
+function renderSupervision(){
+  const q=$("supSearch").value.trim().toLowerCase(),list=$("supList");
+  const sorted=[...supervisions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const totalMins=supervisions.reduce((a,s)=>a+supMinutes(s),0);
+  $("supCount").textContent=supervisions.length;
+  $("supHours").textContent=formatDur(totalMins*60000);
+  $("supLast").textContent=sorted.length?new Date(sorted[0].date+"T00:00").toLocaleDateString([],{day:"numeric",month:"short",year:"numeric"}):"—";
+  $("supSigned").textContent=supervisions.filter(s=>s.signedOff).length;
+
+  const filtered=sorted.filter(s=>{
+    if(!q)return true;
+    const text=[s.date,supDateLabel(s.date),s.supervisor,s.type,s.format,s.topics,s.reflection,s.actions].filter(Boolean).join(" ").toLowerCase();
+    return text.includes(q);
+  });
+  list.innerHTML="";
+  if(!filtered.length){list.innerHTML=`<div class="empty">${q?"No matching supervision sessions.":"No supervision sessions logged yet."}</div>`;return}
+  filtered.forEach(s=>{
+    const card=document.createElement("article");card.className="sup-card";
+    const meta=[s.time||"",s.type||"Individual",s.format||"In person",s.supervisor||""].filter(Boolean).join(" • ");
+    const block=(title,value)=>value?`<div class="sup-block"><b>${title}</b>${escapeHtml(value).replace(/\n/g,"<br>")}</div>`:"";
+    card.innerHTML=`<div class="sup-card-top">
+      <div>
+        <div class="sup-date">${supDateLabel(s.date)}</div>
+        <div class="sup-meta">${escapeHtml(meta)}</div>
+      </div>
+      <div class="sup-dur">${formatDur(supMinutes(s)*60000)}</div>
+    </div>
+    ${block("Topics discussed",s.topics)}
+    ${block("Reflection and learning",s.reflection)}
+    ${block("Actions agreed",s.actions)}
+    <div class="sup-tags"><span class="sup-tag${s.signedOff?" signed":""}">${s.signedOff?"✓ Signed off by supervisor":"Not signed off"}</span></div>
+    <div class="sup-actions"><button type="button">Edit session</button></div>`;
+    card.querySelector("button").addEventListener("click",()=>openSup(s));
+    list.appendChild(card);
+  });
+}
+
+function openSup(s=null){
+  editingSupId=s?.id||null;
+  $("supModalTitle").textContent=s?"Edit supervision session":"Add supervision session";
+  $("deleteSup").hidden=!s;
+  $("supDate").value=s?.date||dayKey(new Date());
+  $("supTime").value=s?.time||"";
+  $("supMins").value=s?.minutes??60;
+  $("supName").value=s?.supervisor||settings.supervisor||"";
+  $("supType").value=s?.type||"Individual";
+  $("supFormat").value=s?.format||"In person";
+  $("supTopics").value=s?.topics||"";
+  $("supReflection").value=s?.reflection||"";
+  $("supActions").value=s?.actions||"";
+  $("supSignedOff").checked=!!s?.signedOff;
+  $("supModal").classList.add("open");
+}
+$("addSupBtn").addEventListener("click",()=>openSup());
+$("cancelSup").addEventListener("click",()=>$("supModal").classList.remove("open"));
+$("saveSup").addEventListener("click",()=>{
+  const date=$("supDate").value,minutes=Number($("supMins").value)||0;
+  if(!date)return alert("Enter the date of the supervision session.");
+  if(minutes<=0)return alert("Enter how long the session was, in minutes.");
+  const rec={
+    id:editingSupId||uid(),
+    date,
+    time:$("supTime").value,
+    minutes,
+    supervisor:$("supName").value.trim(),
+    type:$("supType").value,
+    format:$("supFormat").value,
+    topics:$("supTopics").value.trim(),
+    reflection:$("supReflection").value.trim(),
+    actions:$("supActions").value.trim(),
+    signedOff:$("supSignedOff").checked,
+    updatedAt:Date.now()
+  };
+  supervisions=editingSupId?supervisions.map(x=>x.id===editingSupId?rec:x):[...supervisions,rec];
+  $("supModal").classList.remove("open");persistLocal();
+});
+$("deleteSup").addEventListener("click",()=>{
+  if(editingSupId&&confirm("Delete this supervision session?")){
+    supervisions=supervisions.filter(s=>s.id!==editingSupId);
+    $("supModal").classList.remove("open");persistLocal();
+  }
+});
+$("supSearch").addEventListener("input",renderSupervision);
+
 function download(name,data,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 $("csvBtn").addEventListener("click",()=>{
   const rows=[["Date","Start","Finish","Break minutes","Net hours","Notes"],...[...records].sort((a,b)=>new Date(a.start)-new Date(b.start)).map(r=>{const s=new Date(r.start),f=new Date(r.finish);return [dayKey(s),time(s),time(f),r.breakMinutes||0,(netMs(r)/3600000).toFixed(2),r.notes||""]})];
@@ -783,10 +939,10 @@ $("closeCelebrate").addEventListener("click",()=>$("celebrateModal").classList.r
 
 $("backupBtn").addEventListener("click",()=>$("backupModal").classList.add("open"));
 $("closeBackup").addEventListener("click",()=>$("backupModal").classList.remove("open"));
-$("downloadBackup").addEventListener("click",()=>download("placement-hours-backup.json",JSON.stringify({version:4,records,settings,exportedAt:new Date().toISOString()},null,2),"application/json"));
+$("downloadBackup").addEventListener("click",()=>download("placement-hours-backup.json",JSON.stringify({version:5,records,supervisions,settings,exportedAt:new Date().toISOString()},null,2),"application/json"));
 $("restoreBackup").addEventListener("click",()=>$("restoreFile").click());
 $("restoreFile").addEventListener("change",async e=>{
-  try{const x=JSON.parse(await e.target.files[0].text());if(!Array.isArray(x.records))throw 0;records=x.records;settings={...settings,...(x.settings||{})};persistLocal();alert("Backup restored.")}catch{alert("That backup file could not be read.")}
+  try{const x=JSON.parse(await e.target.files[0].text());if(!Array.isArray(x.records))throw 0;records=x.records;if(Array.isArray(x.supervisions))supervisions=x.supervisions;settings={...settings,...(x.settings||{})};persistLocal();alert("Backup restored.")}catch{alert("That backup file could not be read.")}
 });
 
 $("settingsBtn").addEventListener("click",()=>{loadSettings();$("settingsModal").classList.add("open")});
@@ -845,17 +1001,18 @@ async function reconcileCloud(){
   const remote=snap.data(),remoteUpdated=Number(remote.updatedAt)||0,localUpdated=Number(meta.localUpdatedAt)||0;
   if(remoteUpdated>localUpdated){
     records=Array.isArray(remote.records)?remote.records:[];
+    supervisions=Array.isArray(remote.supervisions)?remote.supervisions:[];
     settings={...settings,...(remote.settings||{})};
     if(!settings.goalHours) settings.goalHours="460";
     meta.localUpdatedAt=remoteUpdated;
-    localStorage.setItem(STORAGE,JSON.stringify(records));localStorage.setItem(SETTINGS,JSON.stringify(settings));localStorage.setItem(META,JSON.stringify(meta));render();
+    localStorage.setItem(STORAGE,JSON.stringify(records));localStorage.setItem(SUPERVISIONS,JSON.stringify(supervisions));localStorage.setItem(SETTINGS,JSON.stringify(settings));localStorage.setItem(META,JSON.stringify(meta));render();
   }else if(localUpdated>remoteUpdated) await uploadCloud();
 }
 function queueSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>uploadCloud().catch(e=>{console.error(e);setSyncState("bad","Waiting to sync","Changes are saved locally.")}),600)}
 async function uploadCloud(){
   if(!firebase||!currentUser||!navigator.onLine)return;
   const ref=firebase.doc(firebase.db,"users",currentUser.uid),updatedAt=Number(meta.localUpdatedAt)||Date.now();
-  await firebase.setDoc(ref,{records,settings,updatedAt},{merge:false});
+  await firebase.setDoc(ref,{records,supervisions,settings,updatedAt},{merge:false});
   setSyncState("ok","Cloud sync on",currentUser.email||"Synced");
 }
 window.addEventListener("online",()=>{if(currentUser){setSyncState("","Back online","Syncing…");reconcileCloud().then(()=>setSyncState("ok","Cloud sync on",currentUser.email||"Synced")).catch(()=>{})}});
