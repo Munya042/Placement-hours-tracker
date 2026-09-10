@@ -347,36 +347,40 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 /* ============================================================
    Milestones / calendar / chart
    ============================================================ */
-.milestones{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.milestones{display:grid;grid-template-columns:1fr;gap:0}
 .milestone{
-  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);
-  padding:13px 10px;text-align:center;
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding:11px 2px;border-bottom:1px solid var(--line);
 }
-.milestone strong{display:block;font-size:1.05rem;font-weight:800;letter-spacing:-.02em}
-.milestone small{display:block;color:var(--muted);font-size:.75rem}
-.milestone .badge{display:inline-block;margin-top:6px;padding:3px 8px;border-radius:999px;font-size:.66rem;font-weight:750;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
-.milestone.next{border-color:var(--brand);background:var(--brand-tint)}
-.milestone.next .badge{color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
-.milestone.done{border-color:color-mix(in srgb,var(--green) 40%,var(--line))}
-.milestone.done .badge{color:var(--green);border-color:color-mix(in srgb,var(--green) 40%,var(--line))}
+.milestone:last-child{border-bottom:0}
+.milestone strong{font-size:.92rem;font-weight:750;letter-spacing:-.01em}
+.milestone small{display:none}
+.milestone .badge{font-size:.72rem;font-weight:700;color:var(--muted);white-space:nowrap}
+.milestone.next strong{color:var(--brand-ink)}
+.milestone.next .badge{color:var(--brand-ink);font-weight:800}
+.milestone.done strong{color:var(--green)}
+.milestone.done .badge{color:var(--green)}
 
 /* Progress: calendar pinned to a narrow column, interactive panels beside it. */
-.progress-split{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:14px;align-items:start}
-.trio{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;align-items:start}
+/* Progress tab: wide main column, narrow rail on the right */
+.prog-layout{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:14px;align-items:start}
+.prog-main,.prog-rail{display:grid;gap:14px;min-width:0}
+.prog-duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:14px;align-items:start}
+.prog-duo>*,.prog-main>*,.prog-rail>*{min-width:0}
 .trio>*{min-width:0}
 
 /* Cells are square, but the grid is capped so a wide card can never blow
    them up to 140px the way a full-width grid did. */
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:340px;margin-inline:auto}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-head{text-align:center;color:var(--muted);font-size:.7rem;font-weight:750;padding-bottom:2px}
 .cal-day{
-  aspect-ratio:1/1;display:grid;place-items:center;border-radius:9px;
+  height:30px;display:grid;place-items:center;border-radius:7px;
   background:var(--surface-2);font-size:.78rem;border:1px solid transparent;
   font-variant-numeric:tabular-nums;color:var(--text);width:100%;
   transition:transform .12s ease,border-color .12s ease;
 }
 button.cal-day{cursor:pointer}
-button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
+button.cal-day:hover{transform:scale(1.04);border-color:var(--brand)}
 /* Four steps of one hue: how full the day was, not just whether it happened. */
 .cal-day[data-heat]{font-weight:750;color:var(--brand-ink)}
 .cal-day[data-heat="1"]{background:color-mix(in srgb,var(--brand) 14%,var(--surface))}
@@ -395,7 +399,8 @@ button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
 :root[data-theme="dark"] .cal-legend i[data-heat="4"]{background:color-mix(in srgb,var(--brand) 84%,var(--surface))}
 .cal-day.today{box-shadow:inset 0 0 0 2px var(--brand)}
 .cal-day.sel{border-color:var(--text);transform:scale(1.06)}
-.cal-legend{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:12px;font-size:.68rem;color:var(--muted)}
+.cal-legend{display:flex;align-items:center;gap:6px;font-size:.68rem;color:var(--muted)}
+.cal-under{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:12px}
 .cal-legend i{width:13px;height:13px;border-radius:4px;display:block;background:var(--surface-2)}
 .cal-legend i[data-heat="1"]{background:color-mix(in srgb,var(--brand) 14%,var(--surface))}
 .cal-legend i[data-heat="2"]{background:color-mix(in srgb,var(--brand) 30%,var(--surface))}
@@ -447,14 +452,25 @@ button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
 
 /* ---- Hours by activity: stacked part-to-whole + a legend that doubles
    as the table view, since three light-mode slots sit under 3:1. ---- */
-.act-bar{
-  display:flex;height:26px;border-radius:6px;overflow:hidden;
-  background:var(--surface-2);gap:2px;
-}
-.act-seg{height:100%;min-width:3px;transition:flex-grow .5s cubic-bezier(.2,.8,.3,1);cursor:default}
-.act-seg:first-child{border-radius:6px 0 0 6px}
-.act-seg:last-child{border-radius:0 6px 6px 0}
-.act-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:2px 18px;margin-top:14px}
+.act-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.act-donut{width:100%;display:grid;place-items:center}
+.act-donut svg{width:158px;height:158px;display:block}
+.act-donut .seg{transition:opacity .15s ease;cursor:default}
+.act-donut .seg:hover,.act-donut .seg:focus-visible{opacity:.78}
+.act-centre .lbl{font-size:.72rem;font-weight:700;fill:var(--muted)}
+.act-centre .val{font-size:.95rem;font-weight:800;fill:var(--text)}
+.act-centre .pc{font-size:.72rem;font-weight:700;fill:var(--muted)}
+.act-legend{display:grid;grid-template-columns:1fr;gap:0;width:100%}
+
+/* Clock — time of day, and the ring carries placement progress */
+.clock-wrap{display:grid;place-items:center;gap:11px}
+.clock svg{width:100%;max-width:186px;height:auto;display:block}
+.greet{text-align:center}
+.greet .mi{font-size:1.1rem;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.greet .en{font-size:.73rem;color:var(--muted);margin-top:2px}
+.clock-foot{display:flex;justify-content:space-between;width:100%;gap:10px;
+  padding-top:11px;border-top:1px solid var(--line);font-size:.71rem;color:var(--muted)}
+.clock-foot b{display:block;color:var(--text);font-size:.86rem;font-variant-numeric:tabular-nums}
 .act-item{
   display:grid;grid-template-columns:11px 1fr auto auto;align-items:center;gap:9px;
   padding:6px 0;border-bottom:1px solid var(--line);font-size:.83rem;
@@ -476,7 +492,7 @@ button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
 .viz-tip b{display:block;font-weight:800}
 
 @media(max-width:900px){
-  .progress-split,.trio{grid-template-columns:1fr}
+  .prog-layout,.prog-duo{grid-template-columns:1fr}
 }
 
 .bars{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;align-items:end;height:172px}
@@ -965,69 +981,92 @@ button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
 
   <!-- ================= PROGRESS ================= -->
   <section class="panel stack" id="panel-progress" role="tabpanel" aria-label="Progress" hidden>
-    <div class="stats">
-      <div class="stat"><div class="k">Average shift</div><div class="v num" id="insAvgShift">0h 00m</div></div>
-      <div class="stat"><div class="k">Average per week</div><div class="v num" id="insAvgWeek">0h 00m</div></div>
-      <div class="stat"><div class="k">Longest shift</div><div class="v num" id="insLongest">0h 00m</div></div>
-      <div class="stat"><div class="k">Current streak</div><div class="v num" id="insStreak">0 days</div></div>
-    </div>
+    <div class="prog-layout">
+      <div class="prog-main">
+        <div class="stats">
+          <div class="stat"><div class="k">Average shift</div><div class="v num" id="insAvgShift">0h 00m</div></div>
+          <div class="stat"><div class="k">Average per week</div><div class="v num" id="insAvgWeek">0h 00m</div></div>
+          <div class="stat"><div class="k">Longest shift</div><div class="v num" id="insLongest">0h 00m</div></div>
+          <div class="stat"><div class="k">Current streak</div><div class="v num" id="insStreak">0 days</div></div>
+        </div>
 
-    <div class="progress-split">
-      <div class="card cal-card">
-        <div class="card-head">
-          <h2 id="calTitle">This month</h2>
-          <div class="cal-nav">
-            <button id="calPrev" class="navstep" type="button" aria-label="Previous month"><svg><use href="#i-left"></use></svg></button>
-            <button id="calToday" type="button" class="btn ghost" style="padding:5px 11px;font-size:.78rem">Today</button>
-            <button id="calNext" class="navstep" type="button" aria-label="Next month"><svg><use href="#i-right"></use></svg></button>
+        <div class="card cal-card">
+          <div class="card-head">
+            <h2 id="calTitle">This month</h2>
+            <div class="cal-nav">
+              <button id="calPrev" class="navstep" type="button" aria-label="Previous month"><svg><use href="#i-left"></use></svg></button>
+              <button id="calToday" type="button" class="btn ghost" style="padding:5px 11px;font-size:.78rem">Today</button>
+              <button id="calNext" class="navstep" type="button" aria-label="Next month"><svg><use href="#i-right"></use></svg></button>
+            </div>
+          </div>
+          <div id="calendar" class="calendar"></div>
+          <div class="cal-under">
+            <div class="cal-legend"><span>Shorter day</span><i data-heat="1"></i><i data-heat="2"></i><i data-heat="3"></i><i data-heat="4"></i><span>Longer</span></div>
+            <p class="note" style="margin:0" id="calSummary"></p>
           </div>
         </div>
-        <div id="calendar" class="calendar"></div>
-        <div class="cal-legend"><span>Shorter day</span><i data-heat="1"></i><i data-heat="2"></i><i data-heat="3"></i><i data-heat="4"></i><span>Longer</span></div>
-        <p class="note" style="margin:11px 0 0;text-align:center" id="calSummary"></p>
+
+        <div class="prog-duo">
+          <div class="card">
+            <div class="card-head"><h2>Which days you work</h2></div>
+            <div id="dowChart" class="dow"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Supervision due</h2><button id="dueChange" class="linkbtn" type="button" hidden>Change</button></div>
+            <div id="dueBody"></div>
+          </div>
+        </div>
+
+        <div class="prog-duo">
+          <div class="card">
+            <div class="card-head"><h2>Last 8 weeks</h2><span class="hint">Hours completed each week</span></div>
+            <div id="weekBars" class="bars"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Hours by activity</h2><span class="hint" id="actHint"></span></div>
+            <div class="act-wrap">
+              <div id="actDonut" class="act-donut"></div>
+              <div id="actLegend" class="act-legend"></div>
+            </div>
+            <p class="note" style="margin:12px 0 0" id="actNote"></p>
+          </div>
+        </div>
       </div>
 
-      <div class="card" id="dayCard">
-        <div class="card-head"><h2 id="dayTitle">Today</h2></div>
-        <div class="daycard-total"><b id="dayTotal" class="num">0h 00m</b><span id="daySub">on this day</span></div>
-        <div id="dayBody" class="mini"></div>
-        <button id="dayAdd" class="btn block" type="button" style="margin-top:11px">Add a shift on this day</button>
-      </div>
-    </div>
+      <aside class="prog-rail">
+        <div class="card" id="dayCard">
+          <div class="card-head"><h2 id="dayTitle">Today</h2></div>
+          <div class="daycard-total"><b id="dayTotal" class="num">0h 00m</b><span id="daySub">on this day</span></div>
+          <div id="dayBody" class="mini"></div>
+          <button id="dayAdd" class="btn block" type="button" style="margin-top:11px">Add a shift on this day</button>
+        </div>
 
-    <div class="trio">
-      <div class="card">
-        <div class="card-head"><h2>Which days you work</h2></div>
-        <div id="dowChart" class="dow"></div>
-      </div>
+        <div class="card" id="gapCard" hidden>
+          <div class="card-head"><h2>Days you might have missed</h2></div>
+          <p class="note" style="margin:0 0 11px" id="gapIntro"></p>
+          <div id="gapList" class="mini"></div>
+        </div>
 
-      <div class="card">
-        <div class="card-head"><h2>Supervision due</h2><button id="dueChange" class="linkbtn" type="button" hidden>Change</button></div>
-        <div id="dueBody"></div>
-      </div>
+        <div class="card">
+          <div class="card-head"><h2>Milestones</h2></div>
+          <div id="milestones" class="milestones"></div>
+        </div>
 
-      <div class="card" id="gapCard" hidden>
-        <div class="card-head"><h2>Days you might have missed</h2></div>
-        <p class="note" style="margin:0 0 11px" id="gapIntro"></p>
-        <div id="gapList" class="mini"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head"><h2>Last 8 weeks</h2><span class="hint">Hours completed each week</span></div>
-      <div id="weekBars" class="bars"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-head"><h2>Hours by activity</h2><span class="hint" id="actHint"></span></div>
-      <div id="actBar" class="act-bar"></div>
-      <div id="actLegend" class="act-legend"></div>
-      <p class="note" style="margin:12px 0 0" id="actNote"></p>
-    </div>
-
-    <div class="card">
-      <div class="card-head"><h2>Milestones</h2></div>
-      <div id="milestones" class="milestones"></div>
+        <div class="card" id="clockCard">
+          <div class="card-head"><h2 id="clockTitle">Now</h2><span class="hint" id="clockZone"></span></div>
+          <div class="clock-wrap">
+            <div class="clock" id="clockFace"></div>
+            <div class="greet">
+              <div class="mi" id="greetMi"></div>
+              <div class="en" id="greetEn"></div>
+            </div>
+            <div class="clock-foot">
+              <div><b id="clockPct">0%</b>of your hours</div>
+              <div style="text-align:right"><b id="clockSun">—</b>sunrise · sunset</div>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
   </section>
 
@@ -1727,9 +1766,154 @@ function render() {
   renderSupervisionDue();
   renderGaps();
   renderActivity();
+  renderClock(totalMs() / 3600000, goalHours());
   renderVersionLabel();
 }
 function renderVersionLabel() { $("verLabel").textContent = `v${APP_VERSION}`; }
+
+/* ------------------------------------------------------------
+   Clock — local time, sky follows real sunrise/sunset, and the
+   outer ring doubles as placement progress.
+   ------------------------------------------------------------ */
+const CLOCK_LAT = -40.62, CLOCK_LON = 175.28;   /* Manawatū */
+const DEG = Math.PI / 180;
+let clockState = { done: 0, goal: 460 };
+let clockTimer = null;
+
+function sunTimes(date, lat, lon) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const doy = Math.floor((date - start) / 86400000);
+  const f = (2 * Math.PI / 365) * (doy - 1);
+  const eqt = 229.18 * (0.000075 + 0.001868*Math.cos(f) - 0.032077*Math.sin(f)
+            - 0.014615*Math.cos(2*f) - 0.040849*Math.sin(2*f));
+  const dec = 0.006918 - 0.399912*Math.cos(f) + 0.070257*Math.sin(f)
+            - 0.006758*Math.cos(2*f) + 0.000907*Math.sin(2*f)
+            - 0.002697*Math.cos(3*f) + 0.00148*Math.sin(3*f);
+  const cosH = (Math.cos(90.833 * DEG) - Math.sin(lat*DEG)*Math.sin(dec)) / (Math.cos(lat*DEG)*Math.cos(dec));
+  if (cosH > 1)  return { rise: null, set: null, polar: "night" };
+  if (cosH < -1) return { rise: null, set: null, polar: "day" };
+  const H = Math.acos(cosH) / DEG;
+  const noon = 720 - 4*lon - eqt + (-date.getTimezoneOffset());
+  const norm = v => ((v % 1440) + 1440) % 1440;
+  return { rise: norm(noon - 4*H), set: norm(noon + 4*H), polar: null };
+}
+function clockPhase(mins, st) {
+  if (st.polar === "day") return "day";
+  if (st.polar === "night") return "night";
+  const TW = 32;
+  if (mins < st.rise - TW || mins > st.set + TW) return "night";
+  if (mins < st.rise + TW) return "dawn";
+  if (mins > st.set - TW) return "dusk";
+  return "day";
+}
+function clockGreeting(mins, phase) {
+  if (phase === "night") return ["Pō mārie", "Peaceful night"];
+  if (mins < 720)  return ["Ata mārie", "Good morning"];
+  if (mins < 1020) return ["Kia ora", "Hello"];
+  return ["Ahiahi mārie", "Good evening"];
+}
+const CLOCK_SKY = {
+  dawn:  ["#f6c99a", "#e98f6b"],
+  day:   ["#a9d9ef", "#6fb3d9"],
+  dusk:  ["#e79a86", "#8a6ba8"],
+  night: ["#22304a", "#0f1826"]
+};
+const CLOCK_INK = { dawn:"#4a2d1e", day:"#123449", dusk:"#2c1836", night:"#dbe6f5" };
+
+function pad2(n) { return String(n).padStart(2, "0"); }
+function clockHHMM(m) { m = ((Math.round(m) % 1440) + 1440) % 1440; return pad2(Math.floor(m/60)) + ":" + pad2(m%60); }
+
+function drawClock() {
+  const face = $("clockFace");
+  if (!face) return;
+  const now = new Date();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  const st = sunTimes(now, CLOCK_LAT, CLOCK_LON);
+  const phase = clockPhase(mins, st);
+  const [c1, c2] = CLOCK_SKY[phase];
+  const ink = CLOCK_INK[phase];
+
+  const h = Math.floor(mins / 60), mi = mins % 60;
+  const hAng = ((h % 12) + mi / 60) * 30, mAng = mi * 6;
+
+  let bodyAng, isSun;
+  if (st.rise != null && mins >= st.rise && mins <= st.set) {
+    isSun = true;
+    bodyAng = 180 + ((mins - st.rise) / (st.set - st.rise)) * 180;
+  } else {
+    isSun = false;
+    const nightLen = st.rise != null ? (1440 - (st.set - st.rise)) : 720;
+    const since = st.rise == null ? 0 : (mins > st.set ? mins - st.set : mins + 1440 - st.set);
+    bodyAng = (since / nightLen) * 180;
+  }
+
+  const R = 78, C = 2 * Math.PI * R;
+  const pct = clockState.goal ? Math.min(1, clockState.done / clockState.goal) : 0;
+
+  const ticks = Array.from({ length: 12 }, (_, i) => {
+    const a = i * 30 * DEG;
+    return `<line x1="${(100+Math.sin(a)*62).toFixed(1)}" y1="${(100-Math.cos(a)*62).toFixed(1)}"
+      x2="${(100+Math.sin(a)*68).toFixed(1)}" y2="${(100-Math.cos(a)*68).toFixed(1)}"
+      stroke="${ink}" stroke-opacity=".5" stroke-width="${i%3===0?2.6:1.3}" stroke-linecap="round"/>`;
+  }).join("");
+
+  const bx = 100 + Math.sin(bodyAng*DEG)*R, by = 100 - Math.cos(bodyAng*DEG)*R;
+
+  face.innerHTML = `
+  <svg viewBox="0 0 200 200" role="img" aria-label="Clock showing ${clockHHMM(mins)}">
+    <defs><radialGradient id="clockSky" cx="50%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/>
+    </radialGradient></defs>
+    <circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface-3)" stroke-width="9"/>
+    <circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--brand)" stroke-width="9"
+      stroke-linecap="round" stroke-dasharray="${(pct*C).toFixed(1)} ${C.toFixed(1)}"
+      transform="rotate(-90 100 100)"/>
+    <circle cx="100" cy="100" r="64" fill="url(#clockSky)"/>
+    ${phase === "night" ? `
+      <circle cx="72" cy="76" r="1.5" fill="#fff" opacity=".85"/>
+      <circle cx="126" cy="88" r="1.1" fill="#fff" opacity=".7"/>
+      <circle cx="112" cy="64" r="1.3" fill="#fff" opacity=".8"/>
+      <circle cx="84" cy="120" r="1" fill="#fff" opacity=".6"/>` : ""}
+    ${ticks}
+    <circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="7"
+      fill="${isSun ? "#ffd479" : "#e8eef7"}" stroke="${isSun ? "#e0a23a" : "#b9c6d8"}" stroke-width="1.5"/>
+    <line x1="100" y1="100" x2="${(100+Math.sin(hAng*DEG)*34).toFixed(1)}" y2="${(100-Math.cos(hAng*DEG)*34).toFixed(1)}"
+      stroke="${ink}" stroke-width="5" stroke-linecap="round"/>
+    <line x1="100" y1="100" x2="${(100+Math.sin(mAng*DEG)*49).toFixed(1)}" y2="${(100-Math.cos(mAng*DEG)*49).toFixed(1)}"
+      stroke="${ink}" stroke-width="3.2" stroke-linecap="round"/>
+    <circle cx="100" cy="100" r="4" fill="${ink}"/>
+  </svg>`;
+
+  const [miTxt, enTxt] = clockGreeting(mins, phase);
+  $("greetMi").textContent = miTxt;
+  $("greetEn").textContent = enTxt;
+  $("clockTitle").textContent = clockHHMM(mins);
+  $("clockPct").textContent = Math.round(pct * 100) + "%";
+  $("clockSun").textContent = st.rise == null ? "—" : clockHHMM(st.rise) + " · " + clockHHMM(st.set);
+  try {
+    $("clockZone").textContent = Intl.DateTimeFormat().resolvedOptions().timeZone.split("/").pop().replace(/_/g, " ");
+  } catch { $("clockZone").textContent = ""; }
+}
+
+function renderClock(done, goal) {
+  clockState = { done, goal };
+  drawClock();
+}
+/* Redraw on the minute only while the page is visible — no background ticking. */
+function startClockTicking() {
+  stopClockTicking();
+  if (document.hidden) return;
+  clockTimer = setInterval(drawClock, 30000);
+}
+function stopClockTicking() { if (clockTimer) { clearInterval(clockTimer); clockTimer = null; } }
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stopClockTicking();
+  else { drawClock(); startClockTicking(); }
+});
+drawClock();
+startClockTicking();
+
+
 
 function updateSummary() {
   const now = new Date();
@@ -2226,8 +2410,8 @@ function renderActivity() {
   const grand = [...totals.values()].reduce((a, b) => a + b, 0);
   const order = [...ACTIVITIES, UNSET_ACTIVITY].filter(a => (totals.get(a.id) || 0) > 0);
 
-  const bar = $("actBar"), legend = $("actLegend");
-  bar.innerHTML = ""; legend.innerHTML = "";
+  const donut = $("actDonut"), legend = $("actLegend");
+  donut.innerHTML = ""; legend.innerHTML = "";
 
   if (!grand) {
     $("actHint").textContent = "";
@@ -2240,17 +2424,54 @@ function renderActivity() {
     ? "Every shift has an activity set."
     : `${((tagged / grand) * 100).toFixed(0)}% of your hours are tagged. Set an activity when you add or edit a shift.`;
 
+  /* Donut drawn as stroked arcs on one circle: stroke-dasharray carries each
+     slice's share, so a single slice at 100% still renders as a full ring. */
+  const R = 54, C = 2 * Math.PI * R, SW = 26;
+  const NSU = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NSU, "svg");
+  svg.setAttribute("viewBox", "0 0 140 140");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Hours by activity");
+
+  const g = document.createElementNS(NSU, "g");
+  g.setAttribute("transform", "rotate(-90 70 70)");
+  let offset = 0;
+  order.forEach(a => {
+    const ms = totals.get(a.id) || 0;
+    const share = ms / grand;
+    const c = document.createElementNS(NSU, "circle");
+    c.setAttribute("class", "seg");
+    c.setAttribute("cx", "70"); c.setAttribute("cy", "70"); c.setAttribute("r", String(R));
+    c.setAttribute("fill", "none");
+    c.setAttribute("stroke", activityColour(a));
+    c.setAttribute("stroke-width", String(SW));
+    c.setAttribute("stroke-dasharray", `${(share * C).toFixed(2)} ${C.toFixed(2)}`);
+    c.setAttribute("stroke-dashoffset", String(-(offset * C).toFixed(2)));
+    c.setAttribute("tabindex", "0");
+    bindTip(c, `<b>${esc(a.label)}</b>${formatDur(ms)} · ${(share * 100).toFixed(1)}%`);
+    g.appendChild(c);
+    offset += share;
+  });
+  svg.appendChild(g);
+
+  const biggest = order.reduce((b, a) => (totals.get(a.id) || 0) > (totals.get(b.id) || 0) ? a : b, order[0]);
+  const bMs = totals.get(biggest.id) || 0;
+  const centre = document.createElementNS(NSU, "text");
+  centre.setAttribute("class", "act-centre");
+  centre.setAttribute("text-anchor", "middle");
+  [[biggest.label, "lbl", 62], [formatDur(bMs), "val", 78], [`${((bMs / grand) * 100).toFixed(0)}%`, "pc", 93]]
+    .forEach(([txt, cls, y]) => {
+      const t = document.createElementNS(NSU, "tspan");
+      t.setAttribute("class", cls); t.setAttribute("x", "70"); t.setAttribute("y", String(y));
+      t.textContent = txt;
+      centre.appendChild(t);
+    });
+  svg.appendChild(centre);
+  donut.appendChild(svg);
+
   order.forEach(a => {
     const ms = totals.get(a.id) || 0;
     const pct = (ms / grand) * 100;
-    const seg = document.createElement("div");
-    seg.className = "act-seg";
-    seg.style.flexGrow = String(Math.max(pct, 0.8));
-    seg.style.background = activityColour(a);
-    seg.tabIndex = 0;
-    bindTip(seg, `<b>${esc(a.label)}</b>${formatDur(ms)} · ${pct.toFixed(1)}%`);
-    bar.appendChild(seg);
-
     const item = document.createElement("div");
     item.className = "act-item";
     item.innerHTML = `<i style="background:${activityColour(a)}"></i>
