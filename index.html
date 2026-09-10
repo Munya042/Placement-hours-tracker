@@ -360,18 +360,124 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 .milestone.done{border-color:color-mix(in srgb,var(--green) 40%,var(--line))}
 .milestone.done .badge{color:var(--green);border-color:color-mix(in srgb,var(--green) 40%,var(--line))}
 
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+/* Progress: calendar pinned to a narrow column, interactive panels beside it. */
+.progress-split{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:14px;align-items:start}
+.trio{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;align-items:start}
+.trio>*{min-width:0}
+
+/* Cells are square, but the grid is capped so a wide card can never blow
+   them up to 140px the way a full-width grid did. */
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:340px;margin-inline:auto}
 .cal-head{text-align:center;color:var(--muted);font-size:.7rem;font-weight:750;padding-bottom:2px}
 .cal-day{
-  aspect-ratio:1/1;display:grid;place-items:center;border-radius:10px;
-  background:var(--surface-2);font-size:.8rem;border:1px solid transparent;font-variant-numeric:tabular-nums;
+  aspect-ratio:1/1;display:grid;place-items:center;border-radius:9px;
+  background:var(--surface-2);font-size:.78rem;border:1px solid transparent;
+  font-variant-numeric:tabular-nums;color:var(--text);width:100%;
+  transition:transform .12s ease,border-color .12s ease;
 }
-.cal-day.has{background:var(--brand-tint);border-color:color-mix(in srgb,var(--brand) 32%,var(--line));font-weight:750;color:var(--brand-ink)}
-.cal-day.today{outline:2px solid var(--brand);outline-offset:1px}
+button.cal-day{cursor:pointer}
+button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
+/* Four steps of one hue: how full the day was, not just whether it happened. */
+.cal-day[data-heat]{font-weight:750;color:var(--brand-ink)}
+.cal-day[data-heat="1"]{background:color-mix(in srgb,var(--brand) 14%,var(--surface))}
+.cal-day[data-heat="2"]{background:color-mix(in srgb,var(--brand) 30%,var(--surface))}
+.cal-day[data-heat="3"]{background:color-mix(in srgb,var(--brand) 48%,var(--surface))}
+.cal-day[data-heat="4"]{background:color-mix(in srgb,var(--brand) 68%,var(--surface));color:#fff}
+:root[data-theme="dark"] .cal-day[data-heat="1"]{background:color-mix(in srgb,var(--brand) 22%,var(--surface))}
+:root[data-theme="dark"] .cal-day[data-heat="2"]{background:color-mix(in srgb,var(--brand) 42%,var(--surface))}
+:root[data-theme="dark"] .cal-day[data-heat="3"]{background:color-mix(in srgb,var(--brand) 62%,var(--surface))}
+:root[data-theme="dark"] .cal-day[data-heat="4"]{background:color-mix(in srgb,var(--brand) 84%,var(--surface))}
+:root[data-theme="dark"] .cal-day[data-heat="3"],
+:root[data-theme="dark"] .cal-day[data-heat="4"]{color:#08120f}
+:root[data-theme="dark"] .cal-legend i[data-heat="1"]{background:color-mix(in srgb,var(--brand) 22%,var(--surface))}
+:root[data-theme="dark"] .cal-legend i[data-heat="2"]{background:color-mix(in srgb,var(--brand) 42%,var(--surface))}
+:root[data-theme="dark"] .cal-legend i[data-heat="3"]{background:color-mix(in srgb,var(--brand) 62%,var(--surface))}
+:root[data-theme="dark"] .cal-legend i[data-heat="4"]{background:color-mix(in srgb,var(--brand) 84%,var(--surface))}
+.cal-day.today{box-shadow:inset 0 0 0 2px var(--brand)}
+.cal-day.sel{border-color:var(--text);transform:scale(1.06)}
+.cal-legend{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:12px;font-size:.68rem;color:var(--muted)}
+.cal-legend i{width:13px;height:13px;border-radius:4px;display:block;background:var(--surface-2)}
+.cal-legend i[data-heat="1"]{background:color-mix(in srgb,var(--brand) 14%,var(--surface))}
+.cal-legend i[data-heat="2"]{background:color-mix(in srgb,var(--brand) 30%,var(--surface))}
+.cal-legend i[data-heat="3"]{background:color-mix(in srgb,var(--brand) 48%,var(--surface))}
+.cal-legend i[data-heat="4"]{background:color-mix(in srgb,var(--brand) 68%,var(--surface))}
 .cal-nav{display:flex;align-items:center;gap:4px}
-.cal-nav button{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);display:grid;place-items:center;background:var(--surface)}
-.cal-nav button:hover{background:var(--surface-2)}
+.cal-nav>button.navstep{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);display:grid;place-items:center;background:var(--surface)}
+.cal-nav>button.navstep:hover{background:var(--surface-2)}
 .cal-nav svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---- Day detail, day-of-week, supervision due, gaps ---- */
+.mini{display:grid;gap:9px}
+.mini-row{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:11px;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+}
+.mini-row .t{font-weight:700;font-size:.87rem}
+.mini-row .m{color:var(--muted);font-size:.79rem;margin-top:1px}
+.mini-row .val{font-weight:800;font-size:.9rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mini-empty{color:var(--muted);font-size:.86rem;padding:14px 2px;text-align:center}
+.gap-actions{display:flex;gap:16px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.gap-actions .linkbtn{white-space:nowrap}
+.daycard-total{
+  display:flex;align-items:baseline;gap:8px;
+  border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:11px;
+}
+.daycard-total b{font-size:1.5rem;letter-spacing:-.03em;font-weight:800}
+.daycard-total span{color:var(--muted);font-size:.83rem}
+
+/* Day-of-week: one series, so one hue and no legend - the title names it. */
+.dow{display:grid;gap:7px}
+.dow-row{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:9px}
+.dow-row .d{font-size:.76rem;color:var(--muted);font-weight:700}
+.dow-track{height:16px;background:var(--surface-2);border-radius:5px;overflow:hidden}
+.dow-fill{height:100%;background:var(--brand);border-radius:0 4px 4px 0;transition:width .5s cubic-bezier(.2,.8,.3,1)}
+.dow-fill[data-any="1"]{min-width:3px}
+.dow-row .v{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+.dow-row.top .v{color:var(--text);font-weight:750}
+
+.due-state{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.due-pill{
+  font-size:.74rem;font-weight:750;padding:4px 10px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--muted);
+}
+.due-pill.ok{color:var(--green);border-color:color-mix(in srgb,var(--green) 42%,var(--line))}
+.due-pill.soon{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 42%,var(--line))}
+.due-pill.late{color:var(--red);border-color:color-mix(in srgb,var(--red) 42%,var(--line))}
+.due-main{font-size:.9rem;font-weight:700}
+
+/* ---- Hours by activity: stacked part-to-whole + a legend that doubles
+   as the table view, since three light-mode slots sit under 3:1. ---- */
+.act-bar{
+  display:flex;height:26px;border-radius:6px;overflow:hidden;
+  background:var(--surface-2);gap:2px;
+}
+.act-seg{height:100%;min-width:3px;transition:flex-grow .5s cubic-bezier(.2,.8,.3,1);cursor:default}
+.act-seg:first-child{border-radius:6px 0 0 6px}
+.act-seg:last-child{border-radius:0 6px 6px 0}
+.act-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:2px 18px;margin-top:14px}
+.act-item{
+  display:grid;grid-template-columns:11px 1fr auto auto;align-items:center;gap:9px;
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:.83rem;
+}
+.act-item i{width:11px;height:11px;border-radius:3px;display:block}
+.act-item .n{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act-item .h{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+.act-item .p{color:var(--muted);font-variant-numeric:tabular-nums;min-width:38px;text-align:right}
+
+/* Shared hover layer for every chart and the calendar. */
+.viz-tip{
+  position:fixed;z-index:90;pointer-events:none;opacity:0;
+  background:var(--text);color:var(--bg);
+  font-size:.76rem;font-weight:650;line-height:1.35;
+  padding:7px 10px;border-radius:9px;box-shadow:var(--sh-2);
+  max-width:230px;transform:translate(-50%,-100%);transition:opacity .12s ease;
+}
+.viz-tip.show{opacity:1}
+.viz-tip b{display:block;font-weight:800}
+
+@media(max-width:900px){
+  .progress-split,.trio{grid-template-columns:1fr}
+}
 
 .bars{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;align-items:end;height:172px}
 .bar-col{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;min-width:0}
@@ -866,27 +972,62 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
       <div class="stat"><div class="k">Current streak</div><div class="v num" id="insStreak">0 days</div></div>
     </div>
 
+    <div class="progress-split">
+      <div class="card cal-card">
+        <div class="card-head">
+          <h2 id="calTitle">This month</h2>
+          <div class="cal-nav">
+            <button id="calPrev" class="navstep" type="button" aria-label="Previous month"><svg><use href="#i-left"></use></svg></button>
+            <button id="calToday" type="button" class="btn ghost" style="padding:5px 11px;font-size:.78rem">Today</button>
+            <button id="calNext" class="navstep" type="button" aria-label="Next month"><svg><use href="#i-right"></use></svg></button>
+          </div>
+        </div>
+        <div id="calendar" class="calendar"></div>
+        <div class="cal-legend"><span>Shorter day</span><i data-heat="1"></i><i data-heat="2"></i><i data-heat="3"></i><i data-heat="4"></i><span>Longer</span></div>
+        <p class="note" style="margin:11px 0 0;text-align:center" id="calSummary"></p>
+      </div>
+
+      <div class="card" id="dayCard">
+        <div class="card-head"><h2 id="dayTitle">Today</h2></div>
+        <div class="daycard-total"><b id="dayTotal" class="num">0h 00m</b><span id="daySub">on this day</span></div>
+        <div id="dayBody" class="mini"></div>
+        <button id="dayAdd" class="btn block" type="button" style="margin-top:11px">Add a shift on this day</button>
+      </div>
+    </div>
+
+    <div class="trio">
+      <div class="card">
+        <div class="card-head"><h2>Which days you work</h2></div>
+        <div id="dowChart" class="dow"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Supervision due</h2><button id="dueChange" class="linkbtn" type="button" hidden>Change</button></div>
+        <div id="dueBody"></div>
+      </div>
+
+      <div class="card" id="gapCard" hidden>
+        <div class="card-head"><h2>Days you might have missed</h2></div>
+        <p class="note" style="margin:0 0 11px" id="gapIntro"></p>
+        <div id="gapList" class="mini"></div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-head"><h2>Last 8 weeks</h2><span class="hint">Hours completed each week</span></div>
       <div id="weekBars" class="bars"></div>
     </div>
 
     <div class="card">
-      <div class="card-head"><h2>Milestones</h2></div>
-      <div id="milestones" class="milestones"></div>
+      <div class="card-head"><h2>Hours by activity</h2><span class="hint" id="actHint"></span></div>
+      <div id="actBar" class="act-bar"></div>
+      <div id="actLegend" class="act-legend"></div>
+      <p class="note" style="margin:12px 0 0" id="actNote"></p>
     </div>
 
     <div class="card">
-      <div class="card-head">
-        <h2 id="calTitle">This month</h2>
-        <div class="cal-nav">
-          <button id="calPrev" type="button" aria-label="Previous month"><svg><use href="#i-left"></use></svg></button>
-          <button id="calToday" type="button" class="btn ghost" style="padding:5px 10px;font-size:.8rem">Today</button>
-          <button id="calNext" type="button" aria-label="Next month"><svg><use href="#i-right"></use></svg></button>
-        </div>
-      </div>
-      <div id="calendar" class="calendar"></div>
-      <p class="note" style="margin:12px 0 0" id="calSummary"></p>
+      <div class="card-head"><h2>Milestones</h2></div>
+      <div id="milestones" class="milestones"></div>
     </div>
   </section>
 
@@ -902,6 +1043,7 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 </nav>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="viz-tip" id="vizTip" role="tooltip" aria-hidden="true"></div>
 
 <!-- ================= Onboarding ================= -->
 <div id="welcomeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
@@ -946,6 +1088,10 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
       <label class="field"><span>Start time</span><div class="control"><input id="shiftStart" type="time"></div></label>
       <label class="field"><span>Finish time</span><div class="control"><input id="shiftFinish" type="time"></div></label>
       <div class="field wide"><span>Net hours</span><div class="control" style="background:var(--brand-tint);border-color:color-mix(in srgb,var(--brand) 30%,var(--line))"><strong id="shiftPreview" class="num">0h 00m</strong></div></div>
+      <div class="field wide">
+        <span>What did this time count as? (optional)</span>
+        <div class="preset-row" id="shiftActivity"></div>
+      </div>
       <label class="field wide"><span>Notes (optional)</span><div class="control"><textarea id="shiftNotes" rows="3" placeholder="e.g. induction, client visits, report writing"></textarea></div></label>
     </div>
     <div class="sheet-actions">
@@ -1042,7 +1188,7 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
       <a class="tile" href="about.html">About<small>What this app does</small></a>
       <a class="tile" href="privacy.html">Privacy policy<small>How your data is handled</small></a>
     </div>
-    <p class="note" style="margin-top:14px">Placement Hours <span id="verLabel">v5.1</span></p>
+    <p class="note" style="margin-top:14px">Placement Hours <span id="verLabel">v5.2</span></p>
 
     <div class="sheet-actions">
       <button id="closeSettings" class="btn primary" type="button">Done</button>
@@ -1161,7 +1307,7 @@ const firebaseConfig = {
   appId: "1:1049340690058:web:2d493f342746c17429f773"
 };
 
-const APP_VERSION = "5.1";
+const APP_VERSION = "5.2";
 const NS = "ph.v5";
 const DEVICE_BUCKET = "device";
 const K_BUCKET = id => `${NS}.b.${id}`;
@@ -1183,6 +1329,33 @@ const K_SEEN = `${NS}.seenAccounts`;
 const REMINDER_AFTER_MS = 8 * 60 * 60 * 1000;
 const HOUR_PRESETS = [100, 200, 300, 400, 460, 500, 600, 1000];
 
+/* Categorical hues in fixed order, never cycled. Validated for both modes
+   on the adjacent pairlist (stacked segments): worst CVD dE 9.1 light /
+   8.4 dark, worst normal-vision dE 19.6 / 19.3. Three light slots fall
+   under 3:1 on the card, so the legend below the bar carries every name
+   and value as text - identity is never colour alone. */
+const ACTIVITIES = [
+  { id: "direct",   label: "Direct practice",   light: "#2a78d6", dark: "#3987e5" },
+  { id: "shadow",   label: "Shadowing",         light: "#eb6834", dark: "#d95926" },
+  { id: "admin",    label: "Admin & recording", light: "#1baf7a", dark: "#199e70" },
+  { id: "training", label: "Training",          light: "#eda100", dark: "#c98500" },
+  { id: "meetings", label: "Meetings",          light: "#e87ba4", dark: "#d55181" },
+  { id: "travel",   label: "Travel",            light: "#008300", dark: "#008300" },
+  { id: "other",    label: "Other",             light: "#4a3aa7", dark: "#9085e9" }
+];
+const UNSET_ACTIVITY = { id: "", label: "Not set", light: "#9aa8a3", dark: "#5c6b66" };
+const activityById = id => ACTIVITIES.find(a => a.id === id) || UNSET_ACTIVITY;
+function activityColour(a) {
+  return document.documentElement.dataset.theme === "dark" ? a.dark : a.light;
+}
+const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const SUPERVISION_INTERVALS = [
+  { label: "Weekly", days: 7 },
+  { label: "Fortnightly", days: 14 },
+  { label: "Monthly", days: 30 }
+];
+const GAP_WINDOW_DAYS = 21;
+
 const $ = id => document.getElementById(id);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 
@@ -1200,7 +1373,8 @@ function lsDel(k) { try { localStorage.removeItem(k); } catch {} }
 const DEFAULT_SETTINGS = {
   studentName: "", studentId: "", placementName: "", qualification: "",
   organisation: "", supervisor: "", goalHours: 460,
-  placementStart: "", placementDeadline: "", professionalSummary: ""
+  placementStart: "", placementDeadline: "", professionalSummary: "",
+  supervisionEveryDays: 0
 };
 
 function normaliseSettings(s) {
@@ -1209,8 +1383,12 @@ function normaliseSettings(s) {
   for (const k of Object.keys(DEFAULT_SETTINGS)) if (src[k] !== undefined) out[k] = src[k];
   const goal = Number(out.goalHours);
   out.goalHours = Number.isFinite(goal) && goal > 0 ? goal : 460;
+  const every = Number(out.supervisionEveryDays);
+  out.supervisionEveryDays = Number.isFinite(every) && every > 0 ? Math.round(every) : 0;
   for (const k of Object.keys(DEFAULT_SETTINGS)) {
-    if (k !== "goalHours" && typeof out[k] !== "string") out[k] = out[k] == null ? "" : String(out[k]);
+    if (k !== "goalHours" && k !== "supervisionEveryDays" && typeof out[k] !== "string") {
+      out[k] = out[k] == null ? "" : String(out[k]);
+    }
   }
   return out;
 }
@@ -1222,6 +1400,7 @@ function normaliseBucket(b) {
     settings: normaliseSettings(b.settings),
     active: typeof b.active === "string" ? b.active : null,
     celebrated: Array.isArray(b.celebrated) ? b.celebrated : [],
+    dismissedGaps: Array.isArray(b.dismissedGaps) ? b.dismissedGaps.filter(x => typeof x === "string") : [],
     reminderFor: typeof b.reminderFor === "string" ? b.reminderFor : null,
     onboarded: !!b.onboarded,
     updatedAt: Number(b.updatedAt) || 0
@@ -1435,7 +1614,7 @@ function applyTheme() {
   meta.content = dark ? (bg || "#0b100e") : (brand || "#0d7a6f");
   document.head.appendChild(meta);
 }
-function setTheme(choice) { lsSet(K_THEME, choice); applyTheme(); }
+function setTheme(choice) { lsSet(K_THEME, choice); applyTheme(); renderActivity(); }
 function setAccent(id) { lsSet(K_ACCENT, id); applyTheme(); }
 
 $("accentSwatches").innerHTML = ACCENTS.map(a =>
@@ -1507,7 +1686,7 @@ function finishTracking() {
   const a = activeDate();
   if (!a) return;
   const finish = new Date();
-  const rec = { id: uid(), start: a.toISOString(), finish: finish.toISOString(), breakMinutes: 0, notes: "", updatedAt: Date.now() };
+  const rec = { id: uid(), start: a.toISOString(), finish: finish.toISOString(), breakMinutes: 0, notes: "", activity: "", updatedAt: Date.now() };
   state.records.push(rec);
   state.active = null;
   state.reminderFor = null;
@@ -1543,6 +1722,11 @@ function render() {
   renderShifts();
   renderSupervision();
   renderCalendar();
+  renderDayCard();
+  renderDayOfWeek();
+  renderSupervisionDue();
+  renderGaps();
+  renderActivity();
   renderVersionLabel();
 }
 function renderVersionLabel() { $("verLabel").textContent = `v${APP_VERSION}`; }
@@ -1766,6 +1950,317 @@ function checkCelebrations(done, goal) {
 }
 $("closeCelebrate").addEventListener("click", () => closeModal("celebrateModal"));
 
+/* ------------------------------------------------------------
+   Shared hover/focus layer for the charts and the calendar.
+   Tooltips enhance — every value is also readable as text on the
+   page, so nothing is gated behind a hover.
+   ------------------------------------------------------------ */
+const vizTip = $("vizTip");
+let tipTarget = null;
+/* The tip is position:fixed against the target's viewport rect, so a scroll
+   has to move it. Follow the target rather than hiding, otherwise a tip
+   opened while the page is still settling blinks straight back out. */
+function placeTip() {
+  if (!tipTarget || !tipTarget.isConnected) { hideTip(); return; }
+  const r = tipTarget.getBoundingClientRect();
+  if (r.bottom < 0 || r.top > window.innerHeight) { hideTip(); return; }
+  vizTip.style.left = `${Math.min(Math.max(r.left + r.width / 2, 90), window.innerWidth - 90)}px`;
+  vizTip.style.top = `${Math.max(r.top - 8, 46)}px`;
+}
+function showTip(target, html) {
+  tipTarget = target;
+  vizTip.innerHTML = html;
+  vizTip.classList.add("show");
+  placeTip();
+}
+function hideTip() { tipTarget = null; vizTip.classList.remove("show"); }
+function bindTip(el, html) {
+  el.addEventListener("mouseenter", () => showTip(el, html));
+  el.addEventListener("focus", () => showTip(el, html));
+  el.addEventListener("mouseleave", hideTip);
+  el.addEventListener("blur", hideTip);
+}
+window.addEventListener("scroll", placeTip, { passive: true });
+window.addEventListener("resize", placeTip);
+
+/* ------------------------------------------------------------
+   Day detail — the calendar selects, this panel shows
+   ------------------------------------------------------------ */
+let selectedDay = null;
+function currentDay() { return selectedDay || dayKey(new Date()); }
+
+function shiftsOn(key) {
+  return state.records
+    .filter(r => dayKey(new Date(r.start)) === key)
+    .sort((a, b) => new Date(a.start) - new Date(b.start));
+}
+function supervisionOn(key) {
+  return state.supervisions.filter(x => x.date === key);
+}
+
+function renderDayCard() {
+  const key = currentDay();
+  const d = new Date(`${key}T12:00:00`);
+  const isToday = key === dayKey(new Date());
+  const shifts = shiftsOn(key);
+  const sups = supervisionOn(key);
+  const total = shifts.reduce((a, r) => a + netMs(r), 0);
+
+  $("dayTitle").textContent = isToday ? "Today" : longDate(d).replace(/,[^,]*$/, "");
+  $("dayTotal").textContent = formatDur(total);
+  $("daySub").textContent = isToday
+    ? `logged today · ${shortDate(d)}`
+    : `logged on ${shortDate(d)}`;
+
+  const body = $("dayBody");
+  body.innerHTML = "";
+  if (!shifts.length && !sups.length) {
+    body.innerHTML = `<div class="mini-empty">Nothing recorded on this day.</div>`;
+  }
+  shifts.forEach(r => {
+    const a = activityById(r.activity);
+    const row = document.createElement("div");
+    row.className = "mini-row";
+    row.innerHTML = `<div>
+        <div class="t">${timeOf(new Date(r.start))} → ${timeOf(new Date(r.finish))}</div>
+        <div class="m">${r.breakMinutes ? `${r.breakMinutes}m\u00a0break · ` : ""}${r.activity ? esc(a.label) : "No activity set"}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="val num">${formatDur(netMs(r))}</div>
+        <button class="linkbtn" type="button">Edit</button>
+      </div>`;
+    row.querySelector("button").addEventListener("click", () => openShiftEditor(r));
+    body.appendChild(row);
+  });
+  sups.forEach(x => {
+    const row = document.createElement("div");
+    row.className = "mini-row";
+    row.innerHTML = `<div>
+        <div class="t">Supervision${x.time ? ` · ${esc(x.time)}` : ""}</div>
+        <div class="m">${esc([x.type || "Individual", x.supervisor].filter(Boolean).join(" · "))}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="val num">${formatDur((Number(x.minutes) || 0) * 60000)}</div>
+        <button class="linkbtn" type="button">Edit</button>
+      </div>`;
+    row.querySelector("button").addEventListener("click", () => openSupEditor(x));
+    body.appendChild(row);
+  });
+  $("dayAdd").textContent = isToday ? "Add a shift for today" : `Add a shift on ${shortDate(d)}`;
+}
+$("dayAdd").addEventListener("click", () => openShiftEditor(null, currentDay()));
+
+/* ------------------------------------------------------------
+   Which days you work — one series, so one hue and no legend
+   ------------------------------------------------------------ */
+function renderDayOfWeek() {
+  const totals = new Array(7).fill(0);
+  const counts = new Array(7).fill(0);
+  const seen = new Set();
+  state.records.forEach(r => {
+    const d = new Date(r.start);
+    const i = (d.getDay() + 6) % 7;
+    totals[i] += netMs(r);
+    const k = `${i}|${dayKey(d)}`;
+    if (!seen.has(k)) { seen.add(k); counts[i]++; }
+  });
+  const max = Math.max(1, ...totals);
+  const best = totals.indexOf(Math.max(...totals));
+  const any = totals.some(v => v > 0);
+
+  const wrap = $("dowChart");
+  wrap.innerHTML = "";
+  if (!any) {
+    wrap.innerHTML = `<div class="mini-empty">Log a few shifts and your pattern shows up here.</div>`;
+    return;
+  }
+  DOW.forEach((label, i) => {
+    const row = document.createElement("div");
+    row.className = `dow-row${i === best ? " top" : ""}`;
+    row.innerHTML = `<span class="d">${label}</span>
+      <div class="dow-track"><div class="dow-fill"${totals[i] ? ' data-any="1"' : ""} style="width:${((totals[i] / max) * 100).toFixed(1)}%"></div></div>
+      <span class="v">${totals[i] ? (totals[i] / 3600000).toFixed(1) + "h" : "—"}</span>`;
+    bindTip(row, `<b>${label}</b>${counts[i]} ${counts[i] === 1 ? "day" : "days"} · ${formatDur(totals[i])}`);
+    row.tabIndex = 0;
+    wrap.appendChild(row);
+  });
+}
+
+/* ------------------------------------------------------------
+   Supervision due
+   ------------------------------------------------------------ */
+function renderSupervisionDue() {
+  const body = $("dueBody");
+  const every = Number(state.settings.supervisionEveryDays) || 0;
+  $("dueChange").hidden = !every;
+  body.innerHTML = "";
+
+  if (!every) {
+    body.innerHTML = `<p class="note" style="margin:0 0 11px">How often does your programme expect supervision?</p>
+      <div class="preset-row" id="dueSet"></div>`;
+    const row = $("dueSet");
+    row.innerHTML = SUPERVISION_INTERVALS
+      .map(x => `<button type="button" class="preset" data-days="${x.days}">${x.label}</button>`).join("");
+    row.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+      state.settings = normaliseSettings({ ...state.settings, supervisionEveryDays: Number(btn.dataset.days) });
+      save();
+      toast("Supervision reminder set.", { type: "ok" });
+    }));
+    return;
+  }
+
+  const sorted = [...state.supervisions].sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (!sorted.length) {
+    body.innerHTML = `<div class="due-state"><span class="due-pill soon">No sessions yet</span></div>
+      <p class="note" style="margin:0 0 11px">Expecting one every ${every} days. Log your first session to start the clock.</p>`;
+  } else {
+    const last = new Date(`${sorted[0].date}T12:00:00`);
+    const due = new Date(last); due.setDate(due.getDate() + every);
+    const today = new Date(); today.setHours(12, 0, 0, 0);
+    const days = Math.round((due - today) / 86400000);
+    const tone = days < 0 ? "late" : days <= 2 ? "soon" : "ok";
+    const label = days < 0
+      ? `Overdue by ${Math.abs(days)} ${Math.abs(days) === 1 ? "day" : "days"}`
+      : days === 0 ? "Due today" : `Due in ${days} ${days === 1 ? "day" : "days"}`;
+    body.innerHTML = `<div class="due-state">
+        <span class="due-pill ${tone}">${label}</span>
+        <span class="due-main">${shortDate(due)}</span>
+      </div>
+      <p class="note" style="margin:0 0 11px">Last session ${shortDate(last)} · every ${every} days.</p>`;
+  }
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn block";
+  btn.textContent = "Log a supervision session";
+  btn.addEventListener("click", () => openSupEditor());
+  body.appendChild(btn);
+}
+$("dueChange").addEventListener("click", () => {
+  state.settings = normaliseSettings({ ...state.settings, supervisionEveryDays: 0 });
+  save();
+});
+
+/* ------------------------------------------------------------
+   Days you might have missed — weekdays you normally work with
+   nothing logged, inside a recent window
+   ------------------------------------------------------------ */
+function usualWeekdays() {
+  const tally = new Array(7).fill(0);
+  const seen = new Set();
+  state.records.forEach(r => {
+    const d = new Date(r.start);
+    const k = dayKey(d);
+    if (seen.has(k)) return;
+    seen.add(k);
+    tally[(d.getDay() + 6) % 7]++;
+  });
+  return tally.map((n, i) => ({ i, n })).filter(x => x.n >= 2).map(x => x.i);
+}
+function findGaps() {
+  const usual = usualWeekdays();
+  if (!usual.length || state.records.length < 4) return [];
+  const logged = new Set(state.records.map(r => dayKey(new Date(r.start))));
+  const firstShift = Math.min(...state.records.map(r => new Date(r.start).getTime()));
+  const startBound = state.settings.placementStart
+    ? Math.max(firstShift, new Date(`${state.settings.placementStart}T00:00`).getTime())
+    : firstShift;
+  const out = [];
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  for (let back = 1; back <= GAP_WINDOW_DAYS; back++) {
+    const d = new Date(today); d.setDate(d.getDate() - back);
+    if (d.getTime() < startBound) break;
+    const k = dayKey(d);
+    if (logged.has(k) || state.dismissedGaps.includes(k)) continue;
+    if (!usual.includes((d.getDay() + 6) % 7)) continue;
+    out.push({ key: k, date: d });
+  }
+  return out.slice(0, 4);
+}
+function renderGaps() {
+  const gaps = findGaps();
+  $("gapCard").hidden = gaps.length === 0;
+  if (!gaps.length) return;
+  $("gapIntro").textContent = `You usually work ${gaps.length === 1 ? "this day" : "these days"}, but nothing is logged.`;
+  const list = $("gapList");
+  list.innerHTML = "";
+  gaps.forEach(g => {
+    const row = document.createElement("div");
+    row.className = "mini-row";
+    row.style.flexDirection = "column";
+    row.style.alignItems = "stretch";
+    row.innerHTML = `<div>
+        <div class="t">${longDate(g.date).replace(/,[^,]*$/, "")}</div>
+        <div class="m">Nothing recorded</div>
+      </div>
+      <div class="gap-actions">
+        <button class="linkbtn" type="button" data-act="add">Add a shift</button>
+        <button class="linkbtn danger" type="button" data-act="skip">Not a work day</button>
+      </div>`;
+    row.querySelector('[data-act="add"]').addEventListener("click", () => openShiftEditor(null, g.key));
+    row.querySelector('[data-act="skip"]').addEventListener("click", () => {
+      state.dismissedGaps = pruneGaps([...state.dismissedGaps, g.key]);
+      save();
+    });
+    list.appendChild(row);
+  });
+}
+/* Keep the dismissed list from growing forever — anything older than the
+   window can never be shown again anyway. */
+function pruneGaps(list) {
+  const cutoff = Date.now() - (GAP_WINDOW_DAYS + 7) * 86400000;
+  return [...new Set(list)].filter(k => {
+    const t = new Date(`${k}T12:00:00`).getTime();
+    return Number.isFinite(t) && t >= cutoff;
+  });
+}
+
+/* ------------------------------------------------------------
+   Hours by activity — part-to-whole, with the legend as table view
+   ------------------------------------------------------------ */
+function renderActivity() {
+  const totals = new Map();
+  state.records.forEach(r => {
+    const id = activityById(r.activity).id;
+    totals.set(id, (totals.get(id) || 0) + netMs(r));
+  });
+  const grand = [...totals.values()].reduce((a, b) => a + b, 0);
+  const order = [...ACTIVITIES, UNSET_ACTIVITY].filter(a => (totals.get(a.id) || 0) > 0);
+
+  const bar = $("actBar"), legend = $("actLegend");
+  bar.innerHTML = ""; legend.innerHTML = "";
+
+  if (!grand) {
+    $("actHint").textContent = "";
+    $("actNote").textContent = "Once you log a shift, its hours show up here.";
+    return;
+  }
+  const tagged = grand - (totals.get("") || 0);
+  $("actHint").textContent = `${(grand / 3600000).toFixed(1)}h total`;
+  $("actNote").textContent = tagged === grand
+    ? "Every shift has an activity set."
+    : `${((tagged / grand) * 100).toFixed(0)}% of your hours are tagged. Set an activity when you add or edit a shift.`;
+
+  order.forEach(a => {
+    const ms = totals.get(a.id) || 0;
+    const pct = (ms / grand) * 100;
+    const seg = document.createElement("div");
+    seg.className = "act-seg";
+    seg.style.flexGrow = String(Math.max(pct, 0.8));
+    seg.style.background = activityColour(a);
+    seg.tabIndex = 0;
+    bindTip(seg, `<b>${esc(a.label)}</b>${formatDur(ms)} · ${pct.toFixed(1)}%`);
+    bar.appendChild(seg);
+
+    const item = document.createElement("div");
+    item.className = "act-item";
+    item.innerHTML = `<i style="background:${activityColour(a)}"></i>
+      <span class="n">${esc(a.label)}</span>
+      <span class="h num">${formatDur(ms)}</span>
+      <span class="p num">${pct.toFixed(0)}%</span>`;
+    legend.appendChild(item);
+  });
+}
+
 function renderCalendar() {
   const base = new Date();
   base.setDate(1);
@@ -1782,14 +2277,35 @@ function renderCalendar() {
   const today = new Date();
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const offset = (new Date(y, m, 1).getDay() + 6) % 7;
-  let html = ["M", "T", "W", "T", "F", "S", "S"].map(x => `<div class="cal-head">${x}</div>`).join("");
-  for (let i = 0; i < offset; i++) html += "<div></div>";
+  const cal = $("calendar");
+  cal.innerHTML = ["M", "T", "W", "T", "F", "S", "S"]
+    .map(x => `<div class="cal-head">${x}</div>`).join("")
+    + "<div></div>".repeat(offset);
+
+  const sel = currentDay();
   for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const ms = perDay[d] || 0;
+    const hrs = ms / 3600000;
+    // four steps of the one hue, so a light day reads differently to a double
+    const heat = !ms ? 0 : hrs < 4 ? 1 : hrs < 7 ? 2 : hrs < 9 ? 3 : 4;
     const isToday = d === today.getDate() && m === today.getMonth() && y === today.getFullYear();
-    const label = perDay[d] ? formatDur(perDay[d]) : "No shift";
-    html += `<div class="cal-day${perDay[d] ? " has" : ""}${isToday ? " today" : ""}" title="${d} ${base.toLocaleDateString([], { month: "short" })} — ${label}">${d}</div>`;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `cal-day${isToday ? " today" : ""}${key === sel ? " sel" : ""}`;
+    if (heat) btn.dataset.heat = String(heat);
+    btn.dataset.day = key;
+    btn.textContent = String(d);
+    btn.setAttribute("aria-label", `${d} ${base.toLocaleDateString([], { month: "long" })} — ${ms ? formatDur(ms) : "nothing logged"}`);
+    bindTip(btn, `<b>${shortDate(new Date(`${key}T12:00:00`))}</b>${ms ? formatDur(ms) : "Nothing logged"}`);
+    btn.addEventListener("click", () => {
+      selectedDay = key;
+      renderCalendar();
+      renderDayCard();
+      hideTip();
+    });
+    cal.appendChild(btn);
   }
-  $("calendar").innerHTML = html;
 
   const count = Object.keys(perDay).length;
   const monthMs = Object.values(perDay).reduce((a, b) => a + b, 0);
@@ -1918,7 +2434,8 @@ function shiftFromForm() {
     start: start.toISOString(),
     finish: finish.toISOString(),
     breakMinutes: Math.max(0, Number($("shiftBreak").value) || 0),
-    notes: $("shiftNotes").value.trim()
+    notes: $("shiftNotes").value.trim(),
+    activity: draftActivity
   };
 }
 function updateShiftPreview() {
@@ -1946,12 +2463,26 @@ function usualShift() {
   };
 }
 
-function openShiftEditor(r = null) {
+let draftActivity = "";
+function renderActivityChips() {
+  const wrap = $("shiftActivity");
+  wrap.innerHTML = [UNSET_ACTIVITY, ...ACTIVITIES]
+    .map(a => `<button type="button" class="preset${a.id === draftActivity ? " on" : ""}" data-id="${a.id}">${esc(a.id ? a.label : "Not set")}</button>`)
+    .join("");
+  wrap.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    draftActivity = b.dataset.id;
+    renderActivityChips();
+  }));
+}
+
+function openShiftEditor(r = null, presetDay = null) {
   editingShiftId = r ? r.id : null;
   $("shiftTitle").textContent = r ? "Edit shift" : "Add a shift";
   $("deleteShift").hidden = !r;
-  const d = r ? new Date(r.start) : new Date();
+  const d = r ? new Date(r.start) : (presetDay ? new Date(`${presetDay}T12:00:00`) : new Date());
   const usual = r ? null : usualShift();
+  draftActivity = r ? activityById(r.activity).id : "";
+  renderActivityChips();
   $("shiftDate").value = dayKey(d);
   $("shiftStart").value = r ? new Date(r.start).toTimeString().slice(0, 5) : usual.start;
   $("shiftFinish").value = r ? new Date(r.finish).toTimeString().slice(0, 5) : usual.finish;
@@ -1973,6 +2504,8 @@ $("saveShift").addEventListener("click", () => {
   state.records = editingShiftId
     ? state.records.map(x => (x.id === editingShiftId ? rec : x))
     : [...state.records, rec];
+  selectedDay = dayKey(new Date(rec.start));
+  state.dismissedGaps = pruneGaps(state.dismissedGaps.filter(k => k !== selectedDay));
   closeModal("shiftModal");
   save();
   toast(editingShiftId ? "Shift updated." : `Shift added — ${formatDur(netMs(rec))}`, { type: "ok" });
@@ -2191,10 +2724,11 @@ function csvCell(v) { return `"${String(v ?? "").replaceAll('"', '""')}"`; }
 
 $("csvBtn").addEventListener("click", () => {
   if (!state.records.length) { toast("No shifts to export yet.", { type: "bad" }); return; }
-  const rows = [["Date", "Start", "Finish", "Break minutes", "Net hours", "Notes"]];
+  const rows = [["Date", "Start", "Finish", "Break minutes", "Net hours", "Activity", "Notes"]];
   [...state.records].sort((a, b) => new Date(a.start) - new Date(b.start)).forEach(r => {
     const s = new Date(r.start), f = new Date(r.finish);
-    rows.push([dayKey(s), timeOf(s), timeOf(f), r.breakMinutes || 0, (netMs(r) / 3600000).toFixed(2), r.notes || ""]);
+    rows.push([dayKey(s), timeOf(s), timeOf(f), r.breakMinutes || 0, (netMs(r) / 3600000).toFixed(2),
+      r.activity ? activityById(r.activity).label : "", r.notes || ""]);
   });
   download("placement-hours.csv", rows.map(r => r.map(csvCell).join(",")).join("\r\n"), "text/csv;charset=utf-8");
   toast("CSV downloaded.", { type: "ok" });
@@ -2216,7 +2750,7 @@ function buildReport() {
 
   const shiftRows = sorted.map(r => {
     const a = new Date(r.start), b = new Date(r.finish);
-    return `<tr><td>${shortDate(a)}</td><td>${timeOf(a)}</td><td>${timeOf(b)}</td><td>${r.breakMinutes || 0}m</td><td>${formatDur(netMs(r))}</td><td>${esc(r.notes || "")}</td></tr>`;
+    return `<tr><td>${shortDate(a)}</td><td>${timeOf(a)}</td><td>${timeOf(b)}</td><td>${r.breakMinutes || 0}m</td><td>${formatDur(netMs(r))}</td><td>${r.activity ? esc(activityById(r.activity).label) : ""}</td><td>${esc(r.notes || "")}</td></tr>`;
   }).join("");
 
   const sups = [...state.supervisions].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -2248,6 +2782,20 @@ function buildReport() {
       ${field("Reflection and learning", x.reflection)}
       ${field("Actions agreed", x.actions)}
     </div>`;
+  }).join("");
+
+  /* Hours by activity — a table in print, because programmes want the
+     breakdown evidenced in figures, not read off a colour key. */
+  const actTotals = new Map();
+  sorted.forEach(r => {
+    const id = activityById(r.activity).id;
+    actTotals.set(id, (actTotals.get(id) || 0) + netMs(r));
+  });
+  const actOrder = [...ACTIVITIES, UNSET_ACTIVITY].filter(a => (actTotals.get(a.id) || 0) > 0);
+  const anyTagged = sorted.some(r => r.activity);
+  const actRows = actOrder.map(a => {
+    const v = actTotals.get(a.id) || 0;
+    return `<tr><td>${esc(a.label)}</td><td>${(v / 3600000).toFixed(2)}h</td><td>${formatDur(v)}</td><td>${ms ? ((v / ms) * 100).toFixed(1) : "0.0"}%</td></tr>`;
   }).join("");
 
   const stat = (k, v) => `<div class="report-stat"><span>${k}</span><strong>${esc(v)}</strong></div>`;
@@ -2293,9 +2841,14 @@ function buildReport() {
     <div class="report-section">
       <h3>Shift record</h3>
       ${shiftRows
-        ? `<table class="report-table"><thead><tr><th>Date</th><th>Start</th><th>Finish</th><th>Break</th><th>Net</th><th>Notes</th></tr></thead><tbody>${shiftRows}</tbody></table>`
+        ? `<table class="report-table"><thead><tr><th>Date</th><th>Start</th><th>Finish</th><th>Break</th><th>Net</th><th>Activity</th><th>Notes</th></tr></thead><tbody>${shiftRows}</tbody></table>`
         : "<p class=\"report-p\">No completed shifts recorded.</p>"}
     </div>
+
+    ${anyTagged ? `<div class="report-section">
+      <h3>Hours by activity</h3>
+      <table class="report-table"><thead><tr><th>Activity</th><th>Decimal</th><th>Hours</th><th>Share</th></tr></thead><tbody>${actRows}</tbody></table>
+    </div>` : ""}
 
     ${sups.length ? `<div class="report-section sup-report">
       <h3>Supervision summary</h3>
@@ -2407,6 +2960,7 @@ function mergeBuckets(base, extra) {
     settings,
     active: base.active || extra.active,
     celebrated: [...new Set([...base.celebrated, ...extra.celebrated])],
+    dismissedGaps: [...new Set([...base.dismissedGaps, ...extra.dismissedGaps])],
     onboarded: true,
     updatedAt: Date.now()
   });
@@ -2552,6 +3106,7 @@ async function pushCloud() {
     settings: state.settings,
     active: state.active,
     celebrated: state.celebrated,
+    dismissedGaps: state.dismissedGaps,
     onboarded: state.onboarded,
     updatedAt: state.updatedAt || Date.now(),
     schema: 5,
