@@ -1,4 +1,4 @@
-PLACEMENT HOURS — VERSION 5.0
+PLACEMENT HOURS — VERSION 5.1
 
 A single-page web app (PWA) for students tracking placement, practicum,
 internship or professional-experience hours. No build step, no dependencies:
@@ -13,6 +13,49 @@ FILES
   firestore.rules Firestore security rules
   icon-192.png    app icon
   icon-512.png    app icon
+
+--------------------------------------------------------------------
+WHAT'S NEW IN V5.1
+--------------------------------------------------------------------
+
+Eight accent colours
+  Settings -> Appearance has a swatch row: teal, blue, violet, rose,
+  crimson, amber, forest, slate. Each has a separate lighter variant for
+  dark mode so text stays readable, and the browser/OS chrome colour
+  follows the choice. Theme and accent are stored per device.
+
+Back button on every sheet
+  Settings, the shift and supervision editors, account, backup and the
+  report all have a back arrow in a sticky header. Settings now writes
+  each field as you type (with a brief "Saved" marker), so backing out
+  can never lose an edit. A blank or zero required-hours figure mid-
+  keystroke is ignored rather than resetting the target.
+
+Supervision log in the report
+  The report previously carried a one-line summary row per session. It
+  now has a supervision summary block (sessions, hours, how many signed
+  off, date range, types used) followed by the full log: topics,
+  reflection and learning, actions agreed, and sign-off state per
+  session, plus a supervisor signature line for the log itself.
+
+Movement and automation
+  - Figures count up to their new value, and a stat that changes gets a
+    small nudge. Suppressed while a shift is running, since those numbers
+    move every second, and under prefers-reduced-motion.
+  - Shift rows, stat tiles, milestones and chart bars fade in in
+    sequence; the timer card breathes and shows a live dot while
+    tracking.
+  - Adding a shift is prefilled from your usual hours, worked out from
+    the most common start, finish and break in your last ten shifts,
+    instead of a generic 9-to-5.
+  - If you are not signed in and have eight or more shifts, a prompt
+    offers a backup at most once a week.
+
+Fixes
+  - The report's sheet header printed at the top of the PDF.
+  - A4 minus margins is narrower than the mobile breakpoint, so the
+    signature block and stat grid collapsed to one column when printed.
+  - Content scrolled into the gap above the sticky sheet header.
 
 --------------------------------------------------------------------
 WHAT'S NEW IN V5.0

@@ -42,6 +42,14 @@
   --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:26px;
   --tab-h:64px;
 }
+:root[data-accent="blue"]{--brand:#1d68d1;--brand-ink:#17529f;--brand-tint:#e6effc;--ring:0 0 0 3px rgba(29,104,209,.28)}
+:root[data-accent="violet"]{--brand:#6d3fd4;--brand-ink:#5730a8;--brand-tint:#efe9fd;--ring:0 0 0 3px rgba(109,63,212,.28)}
+:root[data-accent="rose"]{--brand:#c02a63;--brand-ink:#98204e;--brand-tint:#fce8ef;--ring:0 0 0 3px rgba(192,42,99,.28)}
+:root[data-accent="amber"]{--brand:#a8620a;--brand-ink:#854d07;--brand-tint:#fdf0dd;--ring:0 0 0 3px rgba(168,98,10,.28)}
+:root[data-accent="forest"]{--brand:#2c7a3f;--brand-ink:#215e30;--brand-tint:#e5f3e8;--ring:0 0 0 3px rgba(44,122,63,.28)}
+:root[data-accent="slate"]{--brand:#41566b;--brand-ink:#324352;--brand-tint:#e8edf2;--ring:0 0 0 3px rgba(65,86,107,.28)}
+:root[data-accent="crimson"]{--brand:#b2332b;--brand-ink:#8d2822;--brand-tint:#fbe9e7;--ring:0 0 0 3px rgba(178,51,43,.28)}
+
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#0b100e;
@@ -65,6 +73,14 @@
   --sh-2:0 6px 20px rgba(0,0,0,.35);
   --sh-3:0 24px 60px rgba(0,0,0,.55);
 }
+/* Dark needs lighter, less saturated accents to hold contrast on a dark ground. */
+:root[data-theme="dark"][data-accent="blue"]{--brand:#69a6ff;--brand-ink:#a8caff;--brand-tint:#132a4a;--ring:0 0 0 3px rgba(105,166,255,.3)}
+:root[data-theme="dark"][data-accent="violet"]{--brand:#a98bff;--brand-ink:#c9b6ff;--brand-tint:#241a45;--ring:0 0 0 3px rgba(169,139,255,.3)}
+:root[data-theme="dark"][data-accent="rose"]{--brand:#ff87b0;--brand-ink:#ffb3cb;--brand-tint:#3d1527;--ring:0 0 0 3px rgba(255,135,176,.3)}
+:root[data-theme="dark"][data-accent="amber"]{--brand:#f5b75c;--brand-ink:#ffd694;--brand-tint:#3a2a10;--ring:0 0 0 3px rgba(245,183,92,.3)}
+:root[data-theme="dark"][data-accent="forest"]{--brand:#6fd48b;--brand-ink:#a3e6b5;--brand-tint:#153020;--ring:0 0 0 3px rgba(111,212,139,.3)}
+:root[data-theme="dark"][data-accent="slate"]{--brand:#9db4c9;--brand-ink:#c2d3e2;--brand-tint:#1e2b36;--ring:0 0 0 3px rgba(157,180,201,.3)}
+:root[data-theme="dark"][data-accent="crimson"]{--brand:#ff8a80;--brand-ink:#ffb3ab;--brand-tint:#3b1714;--ring:0 0 0 3px rgba(255,138,128,.3)}
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -146,6 +162,28 @@ main{width:min(1080px,100%);margin:auto;padding:14px 16px 32px}
 .panel{min-width:0;animation:rise .28s cubic-bezier(.2,.8,.3,1) both}
 @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Rows fade up in sequence as a list renders. The delay is capped so a
+   long list never feels like it is loading in slowly. */
+@keyframes rowin{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.list .row{animation:rowin .32s cubic-bezier(.2,.8,.3,1) both;animation-delay:var(--d,0ms)}
+.stats .stat{animation:rowin .34s cubic-bezier(.2,.8,.3,1) both;animation-delay:var(--d,0ms)}
+@keyframes bump{0%{transform:none}35%{transform:translateY(-3px) scale(1.045)}100%{transform:none}}
+.stat .v.bump{animation:bump .42s cubic-bezier(.3,1.3,.5,1)}
+.milestone{animation:rowin .34s cubic-bezier(.2,.8,.3,1) both;animation-delay:var(--d,0ms)}
+
+/* A quietly breathing halo on the timer card while a shift is running. */
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--brand) 30%,transparent)}50%{box-shadow:0 0 0 10px transparent}}
+.timer-card.tracking{border-color:var(--brand);animation:breathe 2.6s ease-in-out infinite}
+.live-dot{
+  display:none;width:8px;height:8px;border-radius:50%;background:var(--brand);
+  margin-right:7px;vertical-align:middle;animation:pulse 1.6s ease-in-out infinite;
+}
+.timer-card.tracking .live-dot{display:inline-block}
+
+/* The progress bar sweeps to its value rather than snapping. */
+.bar{animation:growbar .6s cubic-bezier(.2,.8,.3,1) both;animation-delay:var(--d,0ms)}
+@keyframes growbar{from{height:4px!important}}
 
 .stack{display:grid;gap:14px;min-width:0}
 .stack>*,.hero>*,.stats>*,.tiles>*,.milestones>*{min-width:0}
@@ -363,13 +401,52 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
   width:min(680px,100%);max-height:92vh;overflow:auto;
   background:var(--surface);border:1px solid var(--line);border-bottom:0;
   border-radius:var(--r-xl) var(--r-xl) 0 0;
-  padding:8px 20px calc(20px + env(safe-area-inset-bottom));
+  padding:0 20px calc(20px + env(safe-area-inset-bottom));
   box-shadow:var(--sh-3);
   animation:slideup .3s cubic-bezier(.2,.85,.3,1) both;
 }
 @keyframes slideup{from{transform:translateY(26px);opacity:.4}to{transform:none;opacity:1}}
-.grabber{width:38px;height:4px;border-radius:999px;background:var(--line-strong);margin:6px auto 14px}
+.grabber{width:38px;height:4px;border-radius:999px;background:var(--line-strong);margin:8px auto 4px}
+.sheet>h2:first-child{margin-top:18px}
 .sheet h2{font-size:1.18rem;margin-bottom:4px}
+
+/* Sheet header with a back affordance — sticky so it stays reachable
+   in the long Settings sheet. */
+.sheet-head{
+  display:flex;align-items:center;gap:10px;margin:0 -20px 12px;padding:12px 20px;
+  position:sticky;top:0;z-index:3;
+  background:var(--surface);border-bottom:1px solid var(--line);
+}
+.sheet-head h2{flex:1;min-width:0;margin:0;font-size:1.12rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.backbtn{
+  width:38px;height:38px;flex:0 0 auto;border-radius:11px;display:grid;place-items:center;
+  border:1px solid var(--line);background:var(--surface-2);
+  transition:background .15s ease,transform .15s ease;
+}
+.backbtn:hover{background:var(--surface-3)}
+.backbtn:active{transform:scale(.92)}
+.backbtn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.saved-pill{
+  flex:0 0 auto;font-size:.74rem;font-weight:750;color:var(--brand-ink);
+  background:var(--brand-tint);border-radius:999px;padding:4px 10px;
+  opacity:0;transform:translateY(-3px);transition:opacity .2s ease,transform .2s ease;
+}
+.saved-pill.show{opacity:1;transform:none}
+
+/* Accent swatches */
+.swatches{display:flex;gap:9px;flex-wrap:wrap}
+.swatch{
+  width:38px;height:38px;border-radius:12px;position:relative;
+  border:2px solid var(--line);background:var(--sw);
+  transition:transform .16s cubic-bezier(.2,1.2,.4,1),border-color .16s ease;
+}
+.swatch:hover{transform:translateY(-2px) scale(1.05)}
+.swatch:active{transform:scale(.94)}
+.swatch[aria-pressed="true"]{border-color:var(--text)}
+.swatch[aria-pressed="true"]::after{
+  content:"";position:absolute;inset:0;display:grid;place-items:center;
+  background:no-repeat center/14px url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'><path d='M4 12.5l5.5 5.5L20 7'/></svg>");
+}
 .sheet .sub{color:var(--muted);font-size:.87rem;margin:0 0 16px}
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
@@ -495,6 +572,17 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 .report-table td{border-bottom:1px solid #e2e8e6;padding:6px;text-align:left;vertical-align:top}
 .report-table tbody tr:nth-child(even) td{background:#f4fbfa}
 .report-p{font-size:.85rem;white-space:pre-wrap;margin:0}
+.sup-entry{border:1px solid #d6e6e3;border-radius:9px;padding:11px 13px;margin-bottom:9px;background:#fbfefe;break-inside:avoid}
+.sup-entry-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border-bottom:1px solid #e4efed;padding-bottom:7px;margin-bottom:8px}
+.sup-entry-head strong{font-size:.9rem;display:block}
+.sup-entry-meta{font-size:.75rem;color:#5b6b68}
+.sup-entry-right{text-align:right;white-space:nowrap;flex:0 0 auto}
+.sup-dur{display:block;font-size:.86rem;font-weight:800;color:#0d7a6f}
+.sup-sign{font-size:.68rem;font-weight:700;color:#8a5a12}
+.sup-sign.yes{color:#1c7a3e}
+.sup-field{margin-top:7px}
+.sup-field span{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:#0d7a6f;font-weight:750}
+.sup-field p{margin:1px 0 0;font-size:.79rem;white-space:pre-wrap;line-height:1.45}
 .signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:36px}
 .signature-line{border-top:1px solid #333;padding-top:5px;font-size:.76rem;color:#555}
 .report-foot{margin-top:24px;font-size:.7rem;color:#888;text-align:center}
@@ -551,7 +639,8 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
   }
   .modal{align-items:center;padding:24px}
   .grabber{display:none}
-  .sheet{padding-top:20px}
+  .sheet{padding-top:0}
+  .sheet-head{padding-top:20px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
@@ -573,7 +662,12 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
     max-height:none;width:100%;max-width:100%;padding:0;background:#fff;
     border:0;border-radius:0;box-shadow:none;overflow:visible!important;animation:none;
   }
-  body.print-report #reportModal .sheet-actions,body.print-report .grabber{display:none!important}
+  body.print-report #reportModal .sheet-actions,body.print-report .grabber,
+  body.print-report .sheet-head{display:none!important}
+  /* A4 minus margins is under the 760px breakpoint, so restore the
+     two-column signature block that the mobile rule would collapse. */
+  body.print-report .signature-grid{grid-template-columns:1fr 1fr;gap:34px}
+  body.print-report .report-grid{grid-template-columns:repeat(3,1fr)}
   body.print-report .report-paper{border:0;border-radius:0;padding:0 2mm!important;width:100%;max-width:100%;overflow:visible!important}
   body.print-report .report-head{flex-wrap:nowrap;gap:10px}
   body.print-report .report-brand{min-width:0;flex:1 1 auto}
@@ -582,6 +676,8 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
   .report-table thead{display:table-header-group}
   .report-table tr{page-break-inside:avoid}
   .report-section{page-break-inside:avoid}
+  body.print-report .sup-report{page-break-inside:auto}
+  body.print-report .sup-entry{page-break-inside:avoid}
   .signature-grid{page-break-inside:avoid}
 }
 </style>
@@ -603,6 +699,8 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
   <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2"/><path d="M8 14h8v7H8z"/></symbol>
   <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19a4.5 4.5 0 0 0 .3-9 6.5 6.5 0 0 0-12.5 2A4 4 0 0 0 6 19z"/></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c.9 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.8.700-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11.5" r="1.2"/><circle cx="11" cy="7.5" r="1.2"/><circle cx="16" cy="9.5" r="1.2"/></symbol>
   <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" stroke="none"/></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2.5" stroke="none"/></symbol>
@@ -674,7 +772,7 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 
       <div class="card timer-card">
         <div class="timer-top"><span id="dateNow">—</span><span id="clockNow" class="num">—</span></div>
-        <div class="timer-status" id="timerStatus">Ready when you are</div>
+        <div class="timer-status" id="timerStatus"><i class="live-dot"></i><span id="timerStatusText">Ready when you are</span></div>
         <div class="timer num" id="timer">00:00:00</div>
         <div class="big-buttons">
           <button id="startBtn" class="big start" type="button"><svg><use href="#i-play"></use></svg> Start</button>
@@ -808,7 +906,9 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 <div id="welcomeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
   <div class="sheet">
     <div class="grabber"></div>
-    <h2 id="welcomeTitle">Welcome to Placement Hours</h2>
+    <div class="sheet-head">
+      <h2 id="welcomeTitle">Welcome to Placement Hours</h2>
+    </div>
     <p class="sub">A minute of setup and your tracker is ready. You can change any of this later in Settings.</p>
     <div class="form-grid">
       <label class="field wide"><span>Your name (used on reports)</span><div class="control"><input id="wName" placeholder="Your full name" autocomplete="name"></div></label>
@@ -834,7 +934,10 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 <div id="shiftModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="shiftTitle">
   <div class="sheet">
     <div class="grabber"></div>
-    <h2 id="shiftTitle">Add a shift</h2>
+    <div class="sheet-head">
+      <button class="backbtn" type="button" data-close="shiftModal" aria-label="Back"><svg><use href="#i-back"></use></svg></button>
+      <h2><span id="shiftTitle">Add a shift</span></h2>
+    </div>
     <p class="sub" id="shiftSub">Record a placement day you completed earlier.</p>
     <div class="form-grid">
       <label class="field"><span>Date</span><div class="control"><input id="shiftDate" type="date"></div></label>
@@ -856,7 +959,10 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 <div id="supModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="supTitle">
   <div class="sheet">
     <div class="grabber"></div>
-    <h2 id="supTitle">Add supervision session</h2>
+    <div class="sheet-head">
+      <button class="backbtn" type="button" data-close="supModal" aria-label="Back"><svg><use href="#i-back"></use></svg></button>
+      <h2><span id="supTitle">Add supervision session</span></h2>
+    </div>
     <p class="sub">Supervision is usually assessed separately from placement hours.</p>
     <div class="form-grid">
       <label class="field"><span>Date</span><div class="control"><input id="supDate" type="date"></div></label>
@@ -886,7 +992,11 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 <div id="settingsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
   <div class="sheet">
     <div class="grabber"></div>
-    <h2 id="settingsTitle">Settings</h2>
+    <div class="sheet-head">
+      <button class="backbtn" type="button" data-close="settingsModal" aria-label="Back"><svg><use href="#i-back"></use></svg></button>
+      <h2 id="settingsTitle">Settings</h2>
+      <span class="saved-pill" id="savedPill">Saved</span>
+    </div>
     <p class="sub">These details appear on your placement report.</p>
 
     <p class="section-label">Your placement</p>
@@ -914,6 +1024,9 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
       <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
       <button type="button" data-theme="auto" aria-pressed="true">System</button>
     </div>
+    <p class="section-label" style="margin:14px 0 10px">Accent colour</p>
+    <div class="swatches" id="accentSwatches" role="group" aria-label="Accent colour"></div>
+    <p class="note" style="margin-top:9px">Theme and colour are set per device, so your phone and laptop can differ.</p>
 
     <div class="divider"></div>
     <p class="section-label">Account &amp; backup</p>
@@ -928,10 +1041,10 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
       <a class="tile" href="about.html">About<small>What this app does</small></a>
       <a class="tile" href="privacy.html">Privacy policy<small>How your data is handled</small></a>
     </div>
-    <p class="note" style="margin-top:14px">Placement Hours <span id="verLabel">v5.0</span> · Built by Nash</p>
+    <p class="note" style="margin-top:14px">Placement Hours <span id="verLabel">v5.1</span> · Built by Nash</p>
 
     <div class="sheet-actions">
-      <button id="closeSettings" class="btn primary" type="button">Save &amp; close</button>
+      <button id="closeSettings" class="btn primary" type="button">Done</button>
     </div>
   </div>
 </div>
@@ -940,7 +1053,10 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 <div id="accountModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
   <div class="sheet">
     <div class="grabber"></div>
-    <h2 id="accountTitle">Your account</h2>
+    <div class="sheet-head">
+      <button class="backbtn" type="button" data-close="accountModal" aria-label="Back"><svg><use href="#i-back"></use></svg></button>
+      <h2 id="accountTitle">Your account</h2>
+    </div>
     <p class="sub">Sign in to keep your hours safe and use the app on more than one device.</p>
     <div id="accountArea2"></div>
     <div class="callout" style="margin-top:14px">
@@ -957,7 +1073,10 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 <div id="backupModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="backupTitle">
   <div class="sheet">
     <div class="grabber"></div>
-    <h2 id="backupTitle">Backup and restore</h2>
+    <div class="sheet-head">
+      <button class="backbtn" type="button" data-close="backupModal" aria-label="Back"><svg><use href="#i-back"></use></svg></button>
+      <h2 id="backupTitle">Backup and restore</h2>
+    </div>
     <p class="sub">Download a copy before you change phones or clear your browser data.</p>
     <div class="tiles">
       <button id="downloadBackup" class="tile" type="button">Download backup<small>A single JSON file</small></button>
@@ -972,6 +1091,10 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 <div id="reportModal" class="modal report-modal" role="dialog" aria-modal="true" aria-label="Placement report">
   <div class="sheet">
     <div class="grabber"></div>
+    <div class="sheet-head">
+      <button class="backbtn" type="button" data-close="reportModal" aria-label="Back"><svg><use href="#i-back"></use></svg></button>
+      <h2>Placement report</h2>
+    </div>
     <div id="reportPaper" class="report-paper"></div>
     <div class="sheet-actions">
       <button id="closeReport" class="btn ghost" type="button">Close</button>
@@ -1008,7 +1131,10 @@ button:disabled{opacity:.34;cursor:not-allowed;box-shadow:none}
 <div id="reminderModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="reminderTitle">
   <div class="sheet" style="max-width:460px">
     <div class="grabber"></div>
-    <h2 id="reminderTitle">Still on placement?</h2>
+    <div class="sheet-head">
+      <button class="backbtn" type="button" data-close="reminderModal" aria-label="Back"><svg><use href="#i-back"></use></svg></button>
+      <h2 id="reminderTitle">Still on placement?</h2>
+    </div>
     <p class="sub" id="reminderBody">Your timer has been running for a while. If you've finished for the day, tap Finish — otherwise it will keep counting.</p>
     <div class="sheet-actions">
       <button id="reminderKeep" class="btn ghost" type="button">Keep tracking</button>
@@ -1034,11 +1160,23 @@ const firebaseConfig = {
   appId: "1:1049340690058:web:2d493f342746c17429f773"
 };
 
-const APP_VERSION = "5.0";
+const APP_VERSION = "5.1";
 const NS = "ph.v5";
 const DEVICE_BUCKET = "device";
 const K_BUCKET = id => `${NS}.b.${id}`;
 const K_THEME = `${NS}.theme`;
+const K_ACCENT = `${NS}.accent`;
+const K_BACKUP_NUDGE = `${NS}.lastBackupNudge`;
+const ACCENTS = [
+  { id: "teal",    label: "Teal",    sw: "#0d7a6f" },
+  { id: "blue",    label: "Blue",    sw: "#1d68d1" },
+  { id: "violet",  label: "Violet",  sw: "#6d3fd4" },
+  { id: "rose",    label: "Rose",    sw: "#c02a63" },
+  { id: "crimson", label: "Crimson", sw: "#b2332b" },
+  { id: "amber",   label: "Amber",   sw: "#a8620a" },
+  { id: "forest",  label: "Forest",  sw: "#2c7a3f" },
+  { id: "slate",   label: "Slate",   sw: "#41566b" }
+];
 const K_TAB = `${NS}.tab`;
 const K_SEEN = `${NS}.seenAccounts`;
 const REMINDER_AFTER_MS = 8 * 60 * 60 * 1000;
@@ -1257,6 +1395,7 @@ $$(".modal, .celebrate").forEach(m => {
     if (e.target === m && m.id !== "welcomeModal" && m.id !== "askModal") closeModal(m.id);
   });
 });
+$$("[data-close]").forEach(b => b.addEventListener("click", () => closeModal(b.dataset.close)));
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && modalStack.length) {
     const top = modalStack[modalStack.length - 1];
@@ -1269,15 +1408,42 @@ document.addEventListener("keydown", e => {
    ------------------------------------------------------------ */
 const media = window.matchMedia("(prefers-color-scheme: dark)");
 function themeChoice() { return lsGet(K_THEME) || "auto"; }
+function accentChoice() {
+  const a = lsGet(K_ACCENT);
+  return ACCENTS.some(x => x.id === a) ? a : "teal";
+}
 function applyTheme() {
   const choice = themeChoice();
   const dark = choice === "dark" || (choice === "auto" && media.matches);
-  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  const accent = accentChoice();
+  const root = document.documentElement;
+  root.dataset.theme = dark ? "dark" : "light";
+  if (accent === "teal") delete root.dataset.accent; else root.dataset.accent = accent;
+
   $("themeBtn").querySelector("use").setAttribute("href", dark ? "#i-sun" : "#i-moon");
   $("themeBtn").title = dark ? "Switch to light" : "Switch to dark";
   $$("#themeSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.theme === choice)));
+  $$("#accentSwatches .swatch").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.accent === accent)));
+
+  // keep the browser/OS chrome in step with the chosen palette
+  const brand = getComputedStyle(root).getPropertyValue("--brand").trim();
+  const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
+  $$('meta[name="theme-color"]').forEach(m => m.remove());
+  const meta = document.createElement("meta");
+  meta.name = "theme-color";
+  meta.content = dark ? (bg || "#0b100e") : (brand || "#0d7a6f");
+  document.head.appendChild(meta);
 }
 function setTheme(choice) { lsSet(K_THEME, choice); applyTheme(); }
+function setAccent(id) { lsSet(K_ACCENT, id); applyTheme(); }
+
+$("accentSwatches").innerHTML = ACCENTS.map(a =>
+  `<button type="button" class="swatch" data-accent="${a.id}" style="--sw:${a.sw}" title="${a.label}" aria-label="${a.label}" aria-pressed="false"></button>`
+).join("");
+$$("#accentSwatches .swatch").forEach(b => b.addEventListener("click", () => {
+  setAccent(b.dataset.accent);
+  toast(`${ACCENTS.find(a => a.id === b.dataset.accent).label} it is.`, { timeout: 1800 });
+}));
 media.addEventListener("change", () => { if (themeChoice() === "auto") applyTheme(); });
 $("themeBtn").addEventListener("click", () => {
   const dark = document.documentElement.dataset.theme === "dark";
@@ -1311,7 +1477,7 @@ function tick() {
   if (a) {
     const elapsed = now - a;
     $("timer").textContent = formatDur(elapsed, true);
-    $("timerStatus").textContent = `Tracking since ${timeOf(a)}`;
+    $("timerStatusText").textContent = `Tracking since ${timeOf(a)}`;
     document.title = `${formatDur(elapsed, true)} · Placement Hours`;
     maybeRemind(elapsed, a);
   } else {
@@ -1346,7 +1512,7 @@ function finishTracking() {
   state.reminderFor = null;
   closeModal("reminderModal");
   $("timer").textContent = "00:00:00";
-  $("timerStatus").textContent = "Shift saved";
+  $("timerStatusText").textContent = "Shift saved";
   save();
   toast(`Shift saved — ${formatDur(netMs(rec))}`, {
     type: "ok", action: "Add notes", timeout: 7000,
@@ -1366,10 +1532,11 @@ function render() {
   $("startBtn").disabled = !!state.active;
   $("stopBtn").disabled = !state.active;
   $("timer").classList.toggle("running", !!state.active);
+  $$(".timer-card").forEach(c => c.classList.toggle("tracking", !!state.active));
   $$('.tab[data-tab="today"]').forEach(t => t.classList.toggle("live", !!state.active));
   if (!state.active) {
     $("timer").textContent = "00:00:00";
-    if ($("timerStatus").textContent !== "Shift saved") $("timerStatus").textContent = "Ready when you are";
+    if ($("timerStatusText").textContent !== "Shift saved") $("timerStatusText").textContent = "Ready when you are";
   }
   updateSummary();
   renderShifts();
@@ -1394,14 +1561,14 @@ function updateSummary() {
   const days = new Set(state.records.map(r => dayKey(new Date(r.start))));
   const a = activeDate(); if (a) days.add(dayKey(a));
 
-  $("statWeek").textContent = formatDur(sumBetween(weekStart, weekEnd) + (a && a >= weekStart ? activeMs() : 0));
-  $("statMonth").textContent = formatDur(sumBetween(monthStart, monthEnd) + (a && a >= monthStart ? activeMs() : 0));
-  $("statTotal").textContent = formatDur(total);
-  $("statDays").textContent = days.size;
+  setStat("statWeek", formatDur(sumBetween(weekStart, weekEnd) + (a && a >= weekStart ? activeMs() : 0)));
+  setStat("statMonth", formatDur(sumBetween(monthStart, monthEnd) + (a && a >= monthStart ? activeMs() : 0)));
+  setStat("statTotal", formatDur(total));
+  setStat("statDays", String(days.size));
 
-  $("goalDone").textContent = done.toFixed(1);
+  countTo("goalDone", done, 1);
   $("goalCap").textContent = `of ${goal} required hours`;
-  $("ringPct").textContent = `${Math.round(pct)}%`;
+  countTo("ringPct", pct, 0, "%");
   const C = 2 * Math.PI * 52;
   $("ringBar").setAttribute("stroke-dasharray", C.toFixed(1));
   $("ringBar").setAttribute("stroke-dashoffset", (C * (1 - pct / 100)).toFixed(1));
@@ -1491,6 +1658,38 @@ function updateInsights(now) {
   $("insStreak").textContent = `${streak} ${streak === 1 ? "day" : "days"}`;
 }
 
+/* Numbers count up to their new value instead of snapping, but only when a
+   shift is not running — during a shift the figures move every second and
+   tweening them would just look unsteady. */
+const prefersStill = window.matchMedia("(prefers-reduced-motion: reduce)");
+const counters = new Map();
+function countTo(id, value, decimals = 0, suffix = "") {
+  const el = $(id);
+  const from = counters.has(id) ? counters.get(id) : 0;
+  counters.set(id, value);
+  const write = v => { el.textContent = v.toFixed(decimals) + suffix; };
+  if (prefersStill.matches || state.active || Math.abs(value - from) < 0.05) { write(value); return; }
+  const started = performance.now(), dur = 620;
+  cancelAnimationFrame(el._raf);
+  const step = now => {
+    const t = Math.min(1, (now - started) / dur);
+    const eased = 1 - Math.pow(1 - t, 3);
+    write(from + (value - from) * eased);
+    if (t < 1) el._raf = requestAnimationFrame(step);
+  };
+  el._raf = requestAnimationFrame(step);
+}
+/* A stat that changes gets a small nudge so the change is noticed. */
+function setStat(id, text) {
+  const el = $(id);
+  if (el.textContent === text) return;
+  el.textContent = text;
+  if (prefersStill.matches) return;
+  el.classList.remove("bump");
+  void el.offsetWidth;
+  el.classList.add("bump");
+}
+
 /* updateSummary() runs once a second while a timer is going, so only
    hand the browser new nodes when the markup has actually changed. */
 const painted = new Map();
@@ -1509,10 +1708,10 @@ function renderWeekBars(now) {
     weeks.push({ from, hours: sumBetween(from, to) / 3600000, current: i === 0 });
   }
   const max = Math.max(1, ...weeks.map(w => w.hours));
-  paint("weekBars", weeks.map(w => `
+  paint("weekBars", weeks.map((w, i) => `
     <div class="bar-col">
       <div class="bar-v">${w.hours ? w.hours.toFixed(1) + "h" : ""}</div>
-      <div class="bar-wrap"><div class="bar${w.current ? " now" : ""}" style="height:${Math.max(4, (w.hours / max) * 114).toFixed(0)}px"></div></div>
+      <div class="bar-wrap"><div class="bar${w.current ? " now" : ""}" style="height:${Math.max(4, (w.hours / max) * 114).toFixed(0)}px;--d:${i * 45}ms"></div></div>
       <div class="bar-l">${w.from.toLocaleDateString([], { day: "numeric", month: "short" })}</div>
     </div>`).join(""));
 }
@@ -1537,7 +1736,7 @@ function renderMilestones(done, goal) {
   paint("milestones", steps.map(v => {
     const isDone = done >= v, isNext = !isDone && v === next;
     const badge = isDone ? "Reached" : isNext ? "Next up" : "Upcoming";
-    return `<div class="milestone ${isDone ? "done" : isNext ? "next" : ""}">
+    return `<div class="milestone ${isDone ? "done" : isNext ? "next" : ""}" style="--d:${steps.indexOf(v) * 55}ms">
       <strong>${isDone ? "✓ " : ""}${v}h</strong>
       <small>${v === goal ? "Placement goal" : "Milestone"}</small>
       <span class="badge">${badge}</span>
@@ -1628,7 +1827,7 @@ function renderShifts() {
   }
 
   const shown = filtered.slice(0, shiftPage * PAGE);
-  shown.forEach(r => {
+  shown.forEach((r, i) => {
     const s = new Date(r.start), f = new Date(r.finish);
     const brk = r.breakMinutes ? ` · ${r.breakMinutes}m\u00a0break` : "";
     const el = document.createElement("article");
@@ -1643,6 +1842,7 @@ function renderShifts() {
       </div>
       ${r.notes ? `<div class="row-note">${esc(r.notes)}</div>` : ""}
       <div class="row-actions"><button class="linkbtn" type="button">Edit</button></div>`;
+    el.style.setProperty("--d", `${Math.min(i, 8) * 35}ms`);
     el.querySelector("button").addEventListener("click", () => openShiftEditor(r));
     list.appendChild(el);
   });
@@ -1679,7 +1879,7 @@ function renderSupervision() {
     </div>`;
     return;
   }
-  filtered.forEach(s => {
+  filtered.forEach((s, i) => {
     const meta = [s.time || "", s.type || "Individual", s.format || "In person", s.supervisor || ""].filter(Boolean).join(" · ");
     const block = (t, v) => v ? `<div class="row-block"><b>${t}</b>${nl2br(v)}</div>` : "";
     const el = document.createElement("article");
@@ -1697,6 +1897,7 @@ function renderSupervision() {
       ${block("Actions agreed", s.actions)}
       <div class="row-tags"><span class="tag${s.signedOff ? " ok" : ""}">${s.signedOff ? "✓ Signed off by supervisor" : "Not signed off"}</span></div>
       <div class="row-actions"><button class="linkbtn" type="button">Edit</button></div>`;
+    el.style.setProperty("--d", `${Math.min(i, 8) * 35}ms`);
     el.querySelector("button").addEventListener("click", () => openSupEditor(s));
     list.appendChild(el);
   });
@@ -1725,17 +1926,39 @@ function updateShiftPreview() {
 }
 ["shiftDate", "shiftStart", "shiftFinish", "shiftBreak"].forEach(id => $(id).addEventListener("input", updateShiftPreview));
 
+/* Most students work roughly the same hours each time, so a new shift is
+   prefilled from what they actually log rather than a generic 9-to-5. */
+function usualShift() {
+  const recent = [...state.records]
+    .sort((a, b) => new Date(b.start) - new Date(a.start))
+    .slice(0, 10);
+  if (recent.length < 2) return { start: "09:00", finish: "17:00", breakMinutes: 0 };
+  const common = pick => {
+    const tally = new Map();
+    recent.forEach(r => { const v = pick(r); tally.set(v, (tally.get(v) || 0) + 1); });
+    return [...tally.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  };
+  return {
+    start: common(r => new Date(r.start).toTimeString().slice(0, 5)),
+    finish: common(r => new Date(r.finish).toTimeString().slice(0, 5)),
+    breakMinutes: common(r => Number(r.breakMinutes) || 0)
+  };
+}
+
 function openShiftEditor(r = null) {
   editingShiftId = r ? r.id : null;
   $("shiftTitle").textContent = r ? "Edit shift" : "Add a shift";
-  $("shiftSub").textContent = r ? "Adjust the times, break or notes for this day." : "Record a placement day you completed earlier.";
   $("deleteShift").hidden = !r;
   const d = r ? new Date(r.start) : new Date();
+  const usual = r ? null : usualShift();
   $("shiftDate").value = dayKey(d);
-  $("shiftStart").value = r ? new Date(r.start).toTimeString().slice(0, 5) : "09:00";
-  $("shiftFinish").value = r ? new Date(r.finish).toTimeString().slice(0, 5) : "17:00";
-  $("shiftBreak").value = r ? (r.breakMinutes || 0) : 0;
+  $("shiftStart").value = r ? new Date(r.start).toTimeString().slice(0, 5) : usual.start;
+  $("shiftFinish").value = r ? new Date(r.finish).toTimeString().slice(0, 5) : usual.finish;
+  $("shiftBreak").value = r ? (r.breakMinutes || 0) : usual.breakMinutes;
   $("shiftNotes").value = r ? (r.notes || "") : "";
+  $("shiftSub").textContent = r
+    ? "Adjust the times, break or notes for this day."
+    : (state.records.length >= 2 ? "Prefilled with your usual hours — change anything that differs." : "Record a placement day you completed earlier.");
   updateShiftPreview();
   openModal("shiftModal");
 }
@@ -1828,7 +2051,11 @@ function buildPresets(containerId, inputId) {
     const v = Number($(inputId).value);
     wrap.querySelectorAll(".preset").forEach(b => b.classList.toggle("on", Number(b.dataset.v) === v));
   };
-  wrap.querySelectorAll(".preset").forEach(b => b.addEventListener("click", () => { $(inputId).value = b.dataset.v; sync(); }));
+  wrap.querySelectorAll(".preset").forEach(b => b.addEventListener("click", () => {
+    $(inputId).value = b.dataset.v;
+    sync();
+    $(inputId).dispatchEvent(new Event("input", { bubbles: true }));
+  }));
   $(inputId).addEventListener("input", sync);
   return sync;
 }
@@ -1839,6 +2066,7 @@ const syncSettingsPresets = buildPresets("sPresets", "goalHours");
    Settings
    ------------------------------------------------------------ */
 function loadSettingsForm() {
+  settingsLoading = true;
   const s = state.settings;
   $("studentName").value = s.studentName;
   $("studentId").value = s.studentId;
@@ -1853,25 +2081,54 @@ function loadSettingsForm() {
   syncSettingsPresets();
   renderAccountAreas();
   applyTheme();
+  settingsLoading = false;
 }
 $("settingsBtn").addEventListener("click", () => { loadSettingsForm(); openModal("settingsModal"); });
-$("closeSettings").addEventListener("click", () => {
+
+/* The settings form writes through as you type, so backing out never
+   loses anything and there is no "did I save?" moment. */
+const SETTINGS_FIELDS = ["studentName", "studentId", "placementName", "qualification",
+  "organisation", "supervisor", "goalHours", "placementStart", "placementDeadline", "professionalSummary"];
+let settingsTimer = null, settingsLoading = false;
+
+function flashSaved() {
+  const pill = $("savedPill");
+  pill.classList.add("show");
+  clearTimeout(flashSaved._t);
+  flashSaved._t = setTimeout(() => pill.classList.remove("show"), 1400);
+}
+function commitSettings() {
   const goal = Number($("goalHours").value);
-  state.settings = normaliseSettings({
+  const next = normaliseSettings({
+    ...state.settings,
     studentName: $("studentName").value.trim(),
     studentId: $("studentId").value.trim(),
     placementName: $("placementName").value.trim(),
     qualification: $("qualification").value.trim(),
     organisation: $("organisation").value.trim(),
     supervisor: $("supervisor").value.trim(),
-    goalHours: Number.isFinite(goal) && goal > 0 ? goal : 460,
+    // ignore a blank or nonsense figure mid-keystroke rather than
+    // resetting someone's target to the default while they retype it
+    goalHours: Number.isFinite(goal) && goal > 0 ? goal : state.settings.goalHours,
     placementStart: $("placementStart").value,
     placementDeadline: $("placementDeadline").value,
     professionalSummary: $("professionalSummary").value.trim()
   });
-  closeModal("settingsModal");
+  if (JSON.stringify(next) === JSON.stringify(state.settings)) return;
+  state.settings = next;
+  state.onboarded = true;
   save();
-  toast("Settings saved.", { type: "ok" });
+  flashSaved();
+}
+SETTINGS_FIELDS.forEach(id => $(id).addEventListener("input", () => {
+  if (settingsLoading) return;
+  clearTimeout(settingsTimer);
+  settingsTimer = setTimeout(commitSettings, 450);
+}));
+$("closeSettings").addEventListener("click", () => {
+  clearTimeout(settingsTimer);
+  commitSettings();
+  closeModal("settingsModal");
 });
 
 $("wipeBtn").addEventListener("click", async () => {
@@ -1963,14 +2220,34 @@ function buildReport() {
 
   const sups = [...state.supervisions].sort((a, b) => new Date(a.date) - new Date(b.date));
   const supMins = sups.reduce((a, x) => a + (Number(x.minutes) || 0), 0);
-  const supRows = sups.map(x => `<tr>
-      <td>${shortDate(new Date(`${x.date}T00:00`))}</td>
-      <td>${esc(x.supervisor || "—")}</td>
-      <td>${esc(x.type || "—")}</td>
-      <td>${formatDur((Number(x.minutes) || 0) * 60000)}</td>
-      <td>${esc(x.topics || "")}</td>
-      <td>${x.signedOff ? "Yes" : "No"}</td>
-    </tr>`).join("");
+  const supSigned = sups.filter(x => x.signedOff).length;
+  const supTypes = [...new Set(sups.map(x => x.type).filter(Boolean))].join(", ");
+  const supFirst = sups.length ? shortDate(new Date(`${sups[0].date}T00:00`)) : "—";
+  const supLast = sups.length ? shortDate(new Date(`${sups[sups.length - 1].date}T00:00`)) : "—";
+
+  /* An assessor reads the reflection and the agreed actions, so the report
+     carries the whole entry rather than a one-line summary. */
+  const supEntries = sups.map(x => {
+    const head = [x.time || "", x.type || "Individual", x.format || "In person"].filter(Boolean).join(" · ");
+    const field = (label, value) => value
+      ? `<div class="sup-field"><span>${label}</span><p>${esc(value)}</p></div>`
+      : "";
+    return `<div class="sup-entry">
+      <div class="sup-entry-head">
+        <div>
+          <strong>${shortDate(new Date(`${x.date}T00:00`))}</strong>
+          <span class="sup-entry-meta">${esc(head)}${x.supervisor ? ` · ${esc(x.supervisor)}` : ""}</span>
+        </div>
+        <div class="sup-entry-right">
+          <span class="sup-dur">${formatDur((Number(x.minutes) || 0) * 60000)}</span>
+          <span class="sup-sign${x.signedOff ? " yes" : ""}">${x.signedOff ? "Signed off" : "Not signed off"}</span>
+        </div>
+      </div>
+      ${field("Topics discussed", x.topics)}
+      ${field("Reflection and learning", x.reflection)}
+      ${field("Actions agreed", x.actions)}
+    </div>`;
+  }).join("");
 
   const stat = (k, v) => `<div class="report-stat"><span>${k}</span><strong>${esc(v)}</strong></div>`;
 
@@ -2019,10 +2296,25 @@ function buildReport() {
         : "<p class=\"report-p\">No completed shifts recorded.</p>"}
     </div>
 
-    ${sups.length ? `<div class="report-section">
-      <h3>Supervision log — ${sups.length} ${sups.length === 1 ? "session" : "sessions"}, ${formatDur(supMins * 60000)}</h3>
-      <table class="report-table"><thead><tr><th>Date</th><th>Supervisor</th><th>Type</th><th>Length</th><th>Topics</th><th>Signed</th></tr></thead><tbody>${supRows}</tbody></table>
-    </div>` : ""}
+    ${sups.length ? `<div class="report-section sup-report">
+      <h3>Supervision summary</h3>
+      <div class="report-grid">
+        ${stat("Sessions logged", String(sups.length))}
+        ${stat("Supervision hours", formatDur(supMins * 60000))}
+        ${stat("Signed off", `${supSigned} of ${sups.length}`)}
+        ${stat("First session", supFirst)}
+        ${stat("Most recent", supLast)}
+        ${stat("Types used", supTypes || "—")}
+      </div>
+    </div>
+    <div class="report-section sup-report">
+      <h3>Supervision log</h3>
+      ${supEntries}
+      <div class="signature-grid">
+        <div class="signature-line">Supervisor signature / date</div>
+        <div class="signature-line">Confirming the supervision recorded above took place</div>
+      </div>
+    </div>` : `<div class="report-section"><h3>Supervision log</h3><p class="report-p">No supervision sessions recorded.</p></div>`}
 
     <div class="report-section">
       <h3>Declaration</h3>
@@ -2058,6 +2350,7 @@ $("downloadBackup").addEventListener("click", () => {
   };
   const who = (state.settings.studentName || "placement").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   download(`${who || "placement"}-hours-backup-${dayKey(new Date())}.json`, JSON.stringify(payload, null, 2), "application/json");
+  lsSet(K_BACKUP_NUDGE, String(Date.now()));
   toast("Backup downloaded.", { type: "ok" });
 });
 $("restoreBackup").addEventListener("click", () => $("restoreFile").click());
@@ -2301,11 +2594,26 @@ async function offerDeviceImport(deviceBucket) {
   toast("Device records added to your account.", { type: "ok" });
 }
 
+/* If someone is not signed in, their whole placement record lives in one
+   browser. Nudge them towards a backup rather than waiting for them to
+   lose it — at most once a week, and never on a fresh install. */
+function maybeNudgeBackup() {
+  if (currentUser || state.records.length < 8) return;
+  const last = Number(lsGet(K_BACKUP_NUDGE)) || 0;
+  if (Date.now() - last < 7 * 24 * 3600000) return;
+  lsSet(K_BACKUP_NUDGE, String(Date.now()));
+  setTimeout(() => toast("Your hours are only on this device.", {
+    action: "Back them up", timeout: 9000,
+    onAction: () => openModal("backupModal")
+  }), 2500);
+}
+
 let onboardChecked = false;
 function onboardOnce() {
   if (onboardChecked) return;
   onboardChecked = true;
   maybeOnboard();
+  maybeNudgeBackup();
 }
 
 async function enterAccount(user) {
