@@ -1037,7 +1037,7 @@ button.cal-day:hover{transform:scale(1.04);border-color:var(--brand)}
         </div>
 
         <div class="card" id="clockCard">
-          <div class="card-head"><h2 id="clockTitle">Now</h2><span class="hint" id="clockZone"></span></div>
+          <div class="card-head" style="justify-content:center"><h2 id="clockTitle">Now</h2></div>
           <div class="clock-wrap">
             <div class="clock" id="clockFace"></div>
             <div class="greet">
@@ -1759,7 +1759,60 @@ function renderVersionLabel() { $("verLabel").textContent = `v${APP_VERSION}`; }
    Clock — local time, sky follows real sunrise/sunset, and the
    outer ring doubles as placement progress.
    ------------------------------------------------------------ */
-const CLOCK_LAT = -40.62, CLOCK_LON = 175.28;   /* Manawatū */
+/* Where the sun is depends on latitude and longitude, and the browser only
+   gives us a timezone. This maps the common IANA zones to a representative
+   point. New Zealand is one zone for the whole country, so Pacific/Auckland
+   resolves to the Manawatū — near enough for the lower North Island, out by
+   up to 50 minutes in Southland. */
+const ZONE_POINTS = {
+  "Pacific/Auckland": [-40.35, 175.61], "Pacific/Chatham": [-43.95, -176.55],
+  "Pacific/Fiji": [-18.14, 178.44], "Pacific/Port_Moresby": [-9.44, 147.18],
+  "Pacific/Guadalcanal": [-9.43, 159.96], "Pacific/Noumea": [-22.28, 166.46],
+  "Pacific/Tongatapu": [-21.13, -175.20], "Pacific/Apia": [-13.83, -171.77],
+  "Pacific/Honolulu": [21.31, -157.86], "Pacific/Norfolk": [-29.05, 167.96],
+  "Australia/Sydney": [-33.87, 151.21], "Australia/Melbourne": [-37.81, 144.96],
+  "Australia/Brisbane": [-27.47, 153.03], "Australia/Perth": [-31.95, 115.86],
+  "Australia/Adelaide": [-34.93, 138.60], "Australia/Hobart": [-42.88, 147.33],
+  "Australia/Darwin": [-12.46, 130.84],
+  "Europe/London": [51.51, -0.13], "Europe/Dublin": [53.35, -6.26],
+  "Europe/Paris": [48.86, 2.35], "Europe/Berlin": [52.52, 13.40],
+  "Europe/Madrid": [40.42, -3.70], "Europe/Rome": [41.90, 12.50],
+  "Europe/Amsterdam": [52.37, 4.90], "Europe/Lisbon": [38.72, -9.14],
+  "Europe/Stockholm": [59.33, 18.07], "Europe/Oslo": [59.91, 10.75],
+  "Europe/Warsaw": [52.23, 21.01], "Europe/Athens": [37.98, 23.73],
+  "Europe/Moscow": [55.76, 37.62], "Europe/Kyiv": [50.45, 30.52],
+  "Europe/Zurich": [47.38, 8.54], "Europe/Brussels": [50.85, 4.35],
+  "America/New_York": [40.71, -74.01], "America/Chicago": [41.88, -87.63],
+  "America/Denver": [39.74, -104.99], "America/Los_Angeles": [34.05, -118.24],
+  "America/Vancouver": [49.28, -123.12], "America/Toronto": [43.65, -79.38],
+  "America/Halifax": [44.65, -63.58], "America/Mexico_City": [19.43, -99.13],
+  "America/Sao_Paulo": [-23.55, -46.63], "America/Argentina/Buenos_Aires": [-34.60, -58.38],
+  "America/Bogota": [4.71, -74.07], "America/Lima": [-12.05, -77.04],
+  "America/Santiago": [-33.45, -70.67], "America/Anchorage": [61.22, -149.90],
+  "Asia/Tokyo": [35.68, 139.69], "Asia/Seoul": [37.57, 126.98],
+  "Asia/Shanghai": [31.23, 121.47], "Asia/Hong_Kong": [22.32, 114.17],
+  "Asia/Singapore": [1.35, 103.82], "Asia/Bangkok": [13.76, 100.50],
+  "Asia/Jakarta": [-6.21, 106.85], "Asia/Manila": [14.60, 120.98],
+  "Asia/Kolkata": [22.57, 88.36], "Asia/Karachi": [24.86, 67.01],
+  "Asia/Dhaka": [23.81, 90.41], "Asia/Colombo": [6.93, 79.86],
+  "Asia/Dubai": [25.20, 55.27], "Asia/Jerusalem": [31.78, 35.22],
+  "Asia/Kathmandu": [27.72, 85.32], "Asia/Kuala_Lumpur": [3.14, 101.69],
+  "Africa/Johannesburg": [-26.20, 28.05], "Africa/Cairo": [30.04, 31.24],
+  "Africa/Lagos": [6.52, 3.38], "Africa/Nairobi": [-1.29, 36.82],
+  "Africa/Harare": [-17.83, 31.05], "Africa/Accra": [5.60, -0.19],
+  "Africa/Casablanca": [33.57, -7.59], "Africa/Addis_Ababa": [9.03, 38.74]
+};
+
+/* Falls back to a longitude derived from the UTC offset, which puts solar noon
+   in the right place even for a zone we don't list. */
+/* Timezone only — no location permission, nothing about where the person is
+   beyond the zone their device already reports. */
+function clockPoint(now) {
+  let tz = "";
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch {}
+  if (ZONE_POINTS[tz]) return { lat: ZONE_POINTS[tz][0], lon: ZONE_POINTS[tz][1], tz };
+  return { lat: 0, lon: (-now.getTimezoneOffset() / 60) * 15, tz };
+}
 const DEG = Math.PI / 180;
 let clockState = { done: 0, goal: 460 };
 let clockTimer = null;
@@ -1806,13 +1859,13 @@ const CLOCK_INK = { dawn:"#4a2d1e", day:"#123449", dusk:"#2c1836", night:"#dbe6f
 
 function pad2(n) { return String(n).padStart(2, "0"); }
 function clockHHMM(m) { m = ((Math.round(m) % 1440) + 1440) % 1440; return pad2(Math.floor(m/60)) + ":" + pad2(m%60); }
-
 function drawClock() {
   const face = $("clockFace");
   if (!face) return;
   const now = new Date();
   const mins = now.getHours() * 60 + now.getMinutes();
-  const st = sunTimes(now, CLOCK_LAT, CLOCK_LON);
+  const pt = clockPoint(now);
+  const st = sunTimes(now, pt.lat, pt.lon);
   const phase = clockPhase(mins, st);
   const [c1, c2] = CLOCK_SKY[phase];
   const ink = CLOCK_INK[phase];
@@ -1874,9 +1927,7 @@ function drawClock() {
   $("clockTitle").textContent = clockHHMM(mins);
   $("clockPct").textContent = Math.round(pct * 100) + "%";
   $("clockSun").textContent = st.rise == null ? "—" : clockHHMM(st.rise) + " · " + clockHHMM(st.set);
-  try {
-    $("clockZone").textContent = Intl.DateTimeFormat().resolvedOptions().timeZone.split("/").pop().replace(/_/g, " ");
-  } catch { $("clockZone").textContent = ""; }
+
 }
 
 function renderClock(done, goal) {
