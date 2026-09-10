@@ -561,6 +561,7 @@ button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
 .field>span{display:block;color:var(--muted);font-size:.79rem;font-weight:650;margin-bottom:5px}
 .control{border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px 12px;transition:border-color .15s ease,box-shadow .15s ease}
 .control:focus-within{border-color:var(--brand);box-shadow:var(--ring)}
+.control :focus-visible{box-shadow:none;border-radius:0}
 .control input,.control textarea,.control select{width:100%;border:0;outline:0;background:transparent;resize:vertical}
 .control select{appearance:none;-webkit-appearance:none}
 .select-wrap{position:relative}
@@ -795,7 +796,7 @@ button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
   <symbol id="i-shifts" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
   <symbol id="i-log" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L4 21l1.1-3.8A8.4 8.4 0 1 1 21 11.5z"/></symbol>
   <symbol id="i-progress" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></symbol>
-  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-2.87 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 3 15a1.7 1.7 0 0 0-1.5-1H1a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 2.6 8.6a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 7 4.1V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.87 1.2l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" transform="translate(1 1) scale(.92)"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
@@ -1187,7 +1188,7 @@ button.cal-day:hover{transform:scale(1.08);border-color:var(--brand)}
       <a class="tile" href="about.html">About<small>What this app does</small></a>
       <a class="tile" href="privacy.html">Privacy policy<small>How your data is handled</small></a>
     </div>
-    <p class="note" style="margin-top:14px">Placement Hours <span id="verLabel">v5.2</span> · Built by Nash</p>
+    <p class="note" style="margin-top:14px">Placement Hours <span id="verLabel">v5.2</span></p>
 
     <div class="sheet-actions">
       <button id="closeSettings" class="btn primary" type="button">Done</button>
@@ -2878,7 +2879,7 @@ function buildReport() {
       </div>
     </div>
 
-    <div class="report-foot">Placement Hours v${APP_VERSION} · Built by Nash</div>
+    <div class="report-foot">Placement Hours v${APP_VERSION}</div>
   `;
 }
 [$("reportBtn"), $("reportBtn2")].forEach(b => b.addEventListener("click", () => {
