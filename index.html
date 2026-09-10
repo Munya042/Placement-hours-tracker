@@ -1182,6 +1182,10 @@ button.cal-day:hover{transform:scale(1.04);border-color:var(--brand)}
         <div class="control"><input id="goalHours" type="number" min="1" step="1" value="460" inputmode="numeric"></div>
         <div class="preset-row" id="sPresets"></div>
       </div>
+      <label class="check" for="countSupervision">
+        <input id="countSupervision" type="checkbox">
+        <span>Supervision hours count toward the required total</span>
+      </label>
       <label class="field"><span>Placement start date</span><div class="control"><input id="placementStart" type="date"></div></label>
       <label class="field"><span>Target completion date</span><div class="control"><input id="placementDeadline" type="date"></div></label>
       <label class="field wide"><span>Skills, competencies and reflection summary (optional)</span><div class="control"><textarea id="professionalSummary" rows="4" placeholder="Key skills, competencies, learning or reflections to include in your report."></textarea></div></label>
@@ -1395,7 +1399,7 @@ function lsDel(k) { try { localStorage.removeItem(k); } catch {} }
 
 const DEFAULT_SETTINGS = {
   studentName: "", studentId: "", placementName: "", qualification: "",
-  organisation: "", supervisor: "", goalHours: 460,
+  organisation: "", supervisor: "", goalHours: 460, countSupervision: true,
   placementStart: "", placementDeadline: "", professionalSummary: "",
   supervisionEveryDays: 0
 };
@@ -1408,8 +1412,9 @@ function normaliseSettings(s) {
   out.goalHours = Number.isFinite(goal) && goal > 0 ? goal : 460;
   const every = Number(out.supervisionEveryDays);
   out.supervisionEveryDays = Number.isFinite(every) && every > 0 ? Math.round(every) : 0;
+  out.countSupervision = out.countSupervision !== false;
   for (const k of Object.keys(DEFAULT_SETTINGS)) {
-    if (k !== "goalHours" && k !== "supervisionEveryDays" && typeof out[k] !== "string") {
+    if (k !== "goalHours" && k !== "supervisionEveryDays" && k !== "countSupervision" && typeof out[k] !== "string") {
       out[k] = out[k] == null ? "" : String(out[k]);
     }
   }
@@ -1504,7 +1509,14 @@ function formatDur(ms, withSeconds = false) {
 function activeDate() { return state.active ? new Date(state.active) : null; }
 function activeMs() { const a = activeDate(); return a ? Math.max(0, Date.now() - a) : 0; }
 function completedMs() { return state.records.reduce((a, r) => a + netMs(r), 0); }
-function totalMs() { return completedMs() + activeMs(); }
+/* Supervision minutes count toward the required hours on most programmes, but
+   not all — the setting decides. Shift figures (averages, weekly bars, the
+   calendar) stay shift-only either way. */
+function supervisionMs() {
+  return state.supervisions.reduce((a, x) => a + (Number(x.minutes) || 0), 0) * 60000;
+}
+function countedSupervisionMs() { return state.settings.countSupervision ? supervisionMs() : 0; }
+function totalMs() { return completedMs() + activeMs() + countedSupervisionMs(); }
 function startOfWeek(d) {
   const x = new Date(d); x.setHours(0, 0, 0, 0);
   x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
@@ -2876,6 +2888,7 @@ function loadSettingsForm() {
   $("organisation").value = s.organisation;
   $("supervisor").value = s.supervisor;
   $("goalHours").value = s.goalHours;
+  $("countSupervision").checked = s.countSupervision !== false;
   $("placementStart").value = s.placementStart;
   $("placementDeadline").value = s.placementDeadline;
   $("professionalSummary").value = s.professionalSummary;
@@ -2911,6 +2924,7 @@ function commitSettings() {
     // ignore a blank or nonsense figure mid-keystroke rather than
     // resetting someone's target to the default while they retype it
     goalHours: Number.isFinite(goal) && goal > 0 ? goal : state.settings.goalHours,
+    countSupervision: $("countSupervision").checked,
     placementStart: $("placementStart").value,
     placementDeadline: $("placementDeadline").value,
     professionalSummary: $("professionalSummary").value.trim()
@@ -2926,6 +2940,11 @@ SETTINGS_FIELDS.forEach(id => $(id).addEventListener("input", () => {
   clearTimeout(settingsTimer);
   settingsTimer = setTimeout(commitSettings, 450);
 }));
+$("countSupervision").addEventListener("change", () => {
+  if (settingsLoading) return;
+  clearTimeout(settingsTimer);
+  commitSettings();
+});
 $("closeSettings").addEventListener("click", () => {
   clearTimeout(settingsTimer);
   commitSettings();
@@ -3015,6 +3034,10 @@ function buildReport() {
     ? `${shortDate(first)} – ${shortDate(last)}`
     : (s.placementStart ? `From ${shortDate(new Date(`${s.placementStart}T00:00`))}` : "No shifts recorded");
 
+  const supCounted = s.countSupervision !== false;
+  const supHours = state.supervisions.reduce((a, x) => a + (Number(x.minutes) || 0), 0) / 60;
+  const countedHours = hours + (supCounted ? supHours : 0);
+
   const shiftRows = sorted.map(r => {
     const a = new Date(r.start), b = new Date(r.finish);
     return `<tr><td>${shortDate(a)}</td><td>${timeOf(a)}</td><td>${timeOf(b)}</td><td>${r.breakMinutes || 0}m</td><td>${formatDur(netMs(r))}</td><td>${r.activity ? esc(activityById(r.activity).label) : ""}</td><td>${esc(r.notes || "")}</td></tr>`;
@@ -3094,10 +3117,12 @@ function buildReport() {
     <div class="report-section">
       <h3>Attendance summary</h3>
       <div class="report-grid">
-        ${stat("Hours completed", `${hours.toFixed(2)}h`)}
+        ${stat("Shift hours", `${hours.toFixed(2)}h`)}
+        ${supCounted ? stat("Supervision hours", `${supHours.toFixed(2)}h`) : ""}
+        ${stat(supCounted ? "Total counted" : "Hours completed", `${countedHours.toFixed(2)}h`)}
         ${stat("Hours required", `${goal}h`)}
-        ${stat("Progress", `${goal ? Math.min(100, (hours / goal) * 100).toFixed(1) : 0}%`)}
-        ${stat("Hours remaining", `${Math.max(0, goal - hours).toFixed(2)}h`)}
+        ${stat("Progress", `${goal ? Math.min(100, (countedHours / goal) * 100).toFixed(1) : 0}%`)}
+        ${stat("Hours remaining", `${Math.max(0, goal - countedHours).toFixed(2)}h`)}
         ${stat("Placement days", String(days))}
         ${stat("Average shift", sorted.length ? formatDur(ms / sorted.length) : "0h 00m")}
       </div>
