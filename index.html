@@ -1017,19 +1017,9 @@ button.cal-day:hover{transform:scale(1.04);border-color:var(--brand)}
           </div>
         </div>
 
-        <div class="prog-duo">
-          <div class="card">
-            <div class="card-head"><h2>Last 8 weeks</h2><span class="hint">Hours completed each week</span></div>
-            <div id="weekBars" class="bars"></div>
-          </div>
-          <div class="card">
-            <div class="card-head"><h2>Hours by activity</h2><span class="hint" id="actHint"></span></div>
-            <div class="act-wrap">
-              <div id="actDonut" class="act-donut"></div>
-              <div id="actLegend" class="act-legend"></div>
-            </div>
-            <p class="note" style="margin:12px 0 0" id="actNote"></p>
-          </div>
+        <div class="card">
+          <div class="card-head"><h2>Last 8 weeks</h2><span class="hint">Hours completed each week</span></div>
+          <div id="weekBars" class="bars"></div>
         </div>
       </div>
 
@@ -1039,12 +1029,6 @@ button.cal-day:hover{transform:scale(1.04);border-color:var(--brand)}
           <div class="daycard-total"><b id="dayTotal" class="num">0h 00m</b><span id="daySub">on this day</span></div>
           <div id="dayBody" class="mini"></div>
           <button id="dayAdd" class="btn block" type="button" style="margin-top:11px">Add a shift on this day</button>
-        </div>
-
-        <div class="card" id="gapCard" hidden>
-          <div class="card-head"><h2>Days you might have missed</h2></div>
-          <p class="note" style="margin:0 0 11px" id="gapIntro"></p>
-          <div id="gapList" class="mini"></div>
         </div>
 
         <div class="card">
@@ -2361,6 +2345,7 @@ function findGaps() {
   return out.slice(0, 4);
 }
 function renderGaps() {
+  if (!$("gapCard")) return;          /* card removed from the Progress tab */
   const gaps = findGaps();
   $("gapCard").hidden = gaps.length === 0;
   if (!gaps.length) return;
@@ -2411,6 +2396,7 @@ function renderActivity() {
   const order = [...ACTIVITIES, UNSET_ACTIVITY].filter(a => (totals.get(a.id) || 0) > 0);
 
   const donut = $("actDonut"), legend = $("actLegend");
+  if (!donut || !legend) return;      /* card removed from the Progress tab */
   donut.innerHTML = ""; legend.innerHTML = "";
 
   if (!grand) {
