@@ -1,4 +1,4 @@
-PLACEMENT HOURS — VERSION 5.1
+PLACEMENT HOURS — VERSION 5.2
 
 A single-page web app (PWA) for students tracking placement, practicum,
 internship or professional-experience hours. No build step, no dependencies:
@@ -13,6 +13,52 @@ FILES
   firestore.rules Firestore security rules
   icon-192.png    app icon
   icon-512.png    app icon
+
+--------------------------------------------------------------------
+WHAT'S NEW IN V5.2
+--------------------------------------------------------------------
+
+The Progress tab is now a working panel, not a wall
+  The calendar was drawing 140x140px cells - an 855px-tall card to show
+  thirty numbers, because .cal-day had aspect-ratio:1/1 inside a
+  full-width grid. It now sits in a 300px column at 34px cells (card
+  384px), capped so a wide card can never blow it up again. The "Today"
+  button was also being sized to 30px by the generic .cal-nav button
+  rule, clipping its label to "Tod".
+
+Tap a day, see the day
+  Calendar days are buttons now. Selecting one fills the panel beside it
+  with that day's shifts and supervision sessions, each editable, plus an
+  add button already set to that date. Days shade across four steps of
+  one hue by how long you worked, so a half day reads differently from a
+  double.
+
+Three new panels
+  - Which days you work: total hours by weekday. A different question
+    from the 8-week chart, which is chronological - this is where your
+    hours actually land.
+  - Supervision due: pick weekly, fortnightly or monthly and it tracks
+    due/overdue against your last logged session.
+  - Days you might have missed: weekdays you normally work with nothing
+    logged in the last three weeks, with add and dismiss.
+
+Hours by activity
+  Shifts can be tagged - direct practice, shadowing, admin & recording,
+  training, meetings, travel, other. The Progress tab shows the split as
+  a part-to-whole bar with a legend carrying every name, duration and
+  share, and the report gains an "Hours by activity" table. The shift
+  record table and the CSV export both carry the activity too.
+
+  The category colours are a fixed-order categorical palette validated
+  for both themes on the adjacent pairlist (worst CVD dE 9.1 light /
+  8.4 dark; worst normal-vision dE 19.6 / 19.3). Three light slots fall
+  under 3:1 on the card, so the legend carries every value as text -
+  identity is never colour alone.
+
+Hover layer
+  The calendar, the weekday chart and the activity bar all answer to
+  hover and to keyboard focus. Tooltips only enhance: every value is
+  also printed on the page.
 
 --------------------------------------------------------------------
 WHAT'S NEW IN V5.1
