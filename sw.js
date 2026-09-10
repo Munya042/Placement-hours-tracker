@@ -1,7 +1,7 @@
 /* Placement Hours service worker.
    App shell is cached for offline use. Network-first so a redeploy is
    picked up as soon as the student is online, with the cache as fallback. */
-const CACHE = "placement-hours-v5-2";
+const CACHE = "placement-hours-v5-3";
 const ASSETS = [
   "./", "./index.html", "./about.html", "./privacy.html",
   "./manifest.json", "./icon-192.png", "./icon-512.png"

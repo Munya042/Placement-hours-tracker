@@ -1887,11 +1887,19 @@ function drawClock() {
   const R = 78, C = 2 * Math.PI * R;
   const pct = clockState.goal ? Math.min(1, clockState.done / clockState.goal) : 0;
 
-  const ticks = Array.from({ length: 12 }, (_, i) => {
+  /* Numerals replace the hour ticks; the minute ticks stay as short marks so
+     the face still reads at a glance when the hands cover a number. */
+  const numerals = Array.from({ length: 12 }, (_, i) => {
     const a = i * 30 * DEG;
-    return `<line x1="${(100+Math.sin(a)*62).toFixed(1)}" y1="${(100-Math.cos(a)*62).toFixed(1)}"
-      x2="${(100+Math.sin(a)*68).toFixed(1)}" y2="${(100-Math.cos(a)*68).toFixed(1)}"
-      stroke="${ink}" stroke-opacity=".5" stroke-width="${i%3===0?2.6:1.3}" stroke-linecap="round"/>`;
+    return `<text x="${(100 + Math.sin(a) * 52).toFixed(1)}" y="${(100 - Math.cos(a) * 52).toFixed(1)}"
+      text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="700"
+      fill="${ink}" fill-opacity=".82">${i === 0 ? 12 : i}</text>`;
+  }).join("");
+  const ticks = Array.from({ length: 12 }, (_, i) => {
+    const a = (i * 30 + 15) * DEG;
+    return `<line x1="${(100+Math.sin(a)*58).toFixed(1)}" y1="${(100-Math.cos(a)*58).toFixed(1)}"
+      x2="${(100+Math.sin(a)*62).toFixed(1)}" y2="${(100-Math.cos(a)*62).toFixed(1)}"
+      stroke="${ink}" stroke-opacity=".35" stroke-width="1.3" stroke-linecap="round"/>`;
   }).join("");
 
   const bx = 100 + Math.sin(bodyAng*DEG)*R, by = 100 - Math.cos(bodyAng*DEG)*R;
@@ -1912,11 +1920,12 @@ function drawClock() {
       <circle cx="112" cy="64" r="1.3" fill="#fff" opacity=".8"/>
       <circle cx="84" cy="120" r="1" fill="#fff" opacity=".6"/>` : ""}
     ${ticks}
+    ${numerals}
     <circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="7"
       fill="${isSun ? "#ffd479" : "#e8eef7"}" stroke="${isSun ? "#e0a23a" : "#b9c6d8"}" stroke-width="1.5"/>
-    <line x1="100" y1="100" x2="${(100+Math.sin(hAng*DEG)*34).toFixed(1)}" y2="${(100-Math.cos(hAng*DEG)*34).toFixed(1)}"
+    <line x1="100" y1="100" x2="${(100+Math.sin(hAng*DEG)*31).toFixed(1)}" y2="${(100-Math.cos(hAng*DEG)*31).toFixed(1)}"
       stroke="${ink}" stroke-width="5" stroke-linecap="round"/>
-    <line x1="100" y1="100" x2="${(100+Math.sin(mAng*DEG)*49).toFixed(1)}" y2="${(100-Math.cos(mAng*DEG)*49).toFixed(1)}"
+    <line x1="100" y1="100" x2="${(100+Math.sin(mAng*DEG)*44).toFixed(1)}" y2="${(100-Math.cos(mAng*DEG)*44).toFixed(1)}"
       stroke="${ink}" stroke-width="3.2" stroke-linecap="round"/>
     <circle cx="100" cy="100" r="4" fill="${ink}"/>
   </svg>`;
